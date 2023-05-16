@@ -108,6 +108,20 @@ class Layout
      */
     private $showLeaderLines;
 
+    private $gapWidth;
+
+	private $xAxisRotation;
+
+	/** @var string */
+	private $numFmtCode = '';
+
+	/**
+	 * Position - t=top.
+	 *
+	 * @var string
+	 */
+	private $dLblPos = '';
+
     /**
      * Create a new Layout.
      *
@@ -136,7 +150,30 @@ class Layout
         if (isset($layout['h'])) {
             $this->height = (float) $layout['h'];
         }
+        if (isset($layout['gapWidth'])) {
+        	$this->gapWidth = $layout['gapWidth'];
+        }
+        if (isset($layout['xAxisRotation'])) {
+        	$this->xAxisRotation = $layout['xAxisRotation'];
+        }
+	    if (isset($layout['dLblPos'])) {
+		    $this->dLblPos = (string) $layout['dLblPos'];
+	    }
+	    if (isset($layout['showVal'])) {
+        	$this->showVal = (bool) $layout['showVal'];
+	    }
+	    if (isset($layout['numFmtCode'])) {
+		    $this->numFmtCode = (string) $layout['numFmtCode'];
+	    }
+	    $this->initBoolean($layout, 'showPercent');
     }
+
+	private function initBoolean(array $layout, string $name): void
+	{
+		if (isset($layout[$name])) {
+			$this->$name = (bool) $layout[$name];
+		}
+	}
 
     /**
      * Get Layout Target.
@@ -480,4 +517,44 @@ class Layout
 
         return $this;
     }
+
+    public function getGapWidth() {
+    	return $this->gapWidth;
+    }
+
+    public function setGapWidth($value) {
+    	$this->gapWidth = $value;
+    }
+
+    public function getXAxisRotation() {
+    	return $this->xAxisRotation;
+    }
+
+    public function setXAxisRotation($value) {
+    	$this->xAxisRotation = $value;
+    }
+
+	public function getDLblPos(): string
+	{
+		return $this->dLblPos;
+	}
+
+	public function setDLblPos(string $dLblPos): self
+	{
+		$this->dLblPos = $dLblPos;
+
+		return $this;
+	}
+
+	public function getNumFmtCode(): string
+	{
+		return $this->numFmtCode;
+	}
+
+	public function setNumFmtCode(string $numFmtCode): self
+	{
+		$this->numFmtCode = $numFmtCode;
+
+		return $this;
+	}
 }

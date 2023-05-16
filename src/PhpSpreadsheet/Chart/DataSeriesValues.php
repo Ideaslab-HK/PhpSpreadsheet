@@ -73,6 +73,9 @@ class DataSeriesValues
      */
     private $lineWidth = 12700;
 
+	/** @var ?Layout */
+	private $labelLayout;
+
     /**
      * Create a new DataSeriesValues object.
      *
@@ -398,4 +401,17 @@ class DataSeriesValues
             $this->pointCount = count($this->dataValues);
         }
     }
+
+	public function getLabelLayout(): ?Layout
+	{
+		return $this->labelLayout;
+	}
+
+	public function setLabelLayout(?Layout $labelLayout): self
+	{
+		$this->labelLayout = $labelLayout;
+
+		return $this;
+	}
+
 }

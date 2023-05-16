@@ -265,6 +265,9 @@ class Font
         // Convert from pixel width to column width
         $columnWidth = Drawing::pixelsToCellDimension($columnWidth, $defaultFont);
 
+        // Ideaslab cater for Chinese font
+        $columnWidth *= 1.5;
+
         // Return
         return round($columnWidth, 6);
     }

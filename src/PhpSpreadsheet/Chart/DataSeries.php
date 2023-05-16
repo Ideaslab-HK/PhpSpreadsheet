@@ -40,6 +40,10 @@ class DataSeries
     const STYLE_MARKER = 'marker';
     const STYLE_FILLED = 'filled';
 
+    const VALUE_AXIS_POSITION_LEFT = 'l';
+	const VALUE_AXIS_POSITION_RIGHT = 'r';
+	const VALUE_AXIS_POSITION_TOP = 't';
+	const VALUE_AXIS_POSITION_BOTTOM = 'b';
     /**
      * Series Plot Type.
      *
@@ -103,6 +107,11 @@ class DataSeries
      */
     private $plotValues = [];
 
+	/**
+	 * @var string
+	 */
+	private $valueAxisPosition;
+
     /**
      * Create a new DataSeries.
      *
@@ -115,8 +124,9 @@ class DataSeries
      * @param null|string $plotDirection
      * @param bool $smoothLine
      * @param null|string $plotStyle
+     * @param null|string $valueAxisPosition
      */
-    public function __construct($plotType = null, $plotGrouping = null, array $plotOrder = [], array $plotLabel = [], array $plotCategory = [], array $plotValues = [], $plotDirection = null, $smoothLine = false, $plotStyle = null)
+    public function __construct($plotType = null, $plotGrouping = null, array $plotOrder = [], array $plotLabel = [], array $plotCategory = [], array $plotValues = [], $plotDirection = null, $smoothLine = false, $plotStyle = null, $valueAxisPosition = null)
     {
         $this->plotType = $plotType;
         $this->plotGrouping = $plotGrouping;
@@ -140,6 +150,13 @@ class DataSeries
             $plotDirection = self::DIRECTION_COL;
         }
         $this->plotDirection = $plotDirection;
+
+	    if ($valueAxisPosition === null) {
+		    $this->valueAxisPosition = self::VALUE_AXIS_POSITION_LEFT;
+	    }
+	    else {
+	    	$this->valueAxisPosition = $valueAxisPosition;
+	    }
     }
 
     /**
@@ -239,7 +256,7 @@ class DataSeries
      *
      * @param mixed $index
      *
-     * @return DataSeriesValues
+     * @return bool|DataSeriesValues
      */
     public function getPlotLabelByIndex($index)
     {
@@ -268,7 +285,7 @@ class DataSeries
      *
      * @param mixed $index
      *
-     * @return DataSeriesValues
+     * @return bool|DataSeriesValues
      */
     public function getPlotCategoryByIndex($index)
     {
@@ -321,7 +338,7 @@ class DataSeries
      *
      * @param mixed $index
      *
-     * @return DataSeriesValues
+     * @return bool|DataSeriesValues
      */
     public function getPlotValuesByIndex($index)
     {
@@ -344,6 +361,16 @@ class DataSeries
     {
         return count($this->plotValues);
     }
+
+	/**
+	 * Get Value Axis Position.
+	 *
+	 * @return string
+	 */
+	public function getValueAxisPosition()
+	{
+		return $this->valueAxisPosition;
+	}
 
     /**
      * Get Smooth Line.
@@ -368,6 +395,20 @@ class DataSeries
 
         return $this;
     }
+
+	/**
+	 * Set Value Axis Position
+	 *
+	 * @param $valueAxisPosition
+	 *
+	 * @return DataSeries
+	 */
+	public function setValueAxisPosition($valueAxisPosition)
+	{
+		$this->valueAxisPosition = $valueAxisPosition;
+
+		return $this;
+	}
 
     public function refresh(Worksheet $worksheet)
     {
