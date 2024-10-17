@@ -15,16 +15,17 @@ abstract class AbstractFunctional extends TestCase
     /**
      * Write spreadsheet to disk, reload and return it.
      *
-     * @param Spreadsheet $spreadsheet
      * @param string $format
-     * @param null|callable $readerCustomizer
      *
      * @return Spreadsheet
      */
-    protected function writeAndReload(Spreadsheet $spreadsheet, $format, callable $readerCustomizer = null)
+    protected function writeAndReload(Spreadsheet $spreadsheet, $format, ?callable $readerCustomizer = null, ?callable $writerCustomizer = null)
     {
-        $filename = tempnam(File::sysGetTempDir(), 'phpspreadsheet-test');
+        $filename = File::temporaryFilename();
         $writer = IOFactory::createWriter($spreadsheet, $format);
+        if ($writerCustomizer) {
+            $writerCustomizer($writer);
+        }
         $writer->save($filename);
 
         $reader = IOFactory::createReader($format);

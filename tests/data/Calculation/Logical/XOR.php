@@ -1,13 +1,16 @@
 <?php
 
 return [
-    // No arguments
-    [
+    'no arguments' => [
+        'exception',
+    ],
+    'only argument is null reference' => [
         '#VALUE!',
+        null,
     ],
     [
         false,
-        1 > 0, 2 > 0,
+        true, true,
     ],
     [
         true,
@@ -15,25 +18,25 @@ return [
     ],
     [
         true,
-        1 > 0, 0 > 1,
+        true, false,
     ],
     [
         true,
-        0 > 1, 2 > 0,
+        false, true,
     ],
     [
         false,
-        0 > 1, 0 > 2,
+        false, false,
     ],
     [
         false,
-        1 > 0, 2 > 0, 0 > 1, 0 > 2,
+        true, true, false, false,
     ],
     [
         true,
-        1 > 0, 2 > 0, 3 > 0, 0 > 1,
+        true, true, true, false,
     ],
-    [
+    'ignore string other two should be true' => [
         false,
         'TRUE',
         1,
@@ -45,8 +48,28 @@ return [
         1.5,
         0,
     ],
-    [
+    'only arg is string' => [
         '#VALUE!',
         'HELLO WORLD',
+    ],
+    'true string is ignored' => [
+        true,
+        'TRUE',
+        1,
+    ],
+    'false string is ignored' => [
+        true,
+        'FALSE',
+        true,
+    ],
+    'string 1 is ignored' => [
+        true,
+        '1',
+        true,
+    ],
+    'non-boolean string is ignored' => [
+        true,
+        'ABCD',
+        1,
     ],
 ];

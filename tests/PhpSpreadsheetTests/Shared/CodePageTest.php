@@ -12,19 +12,43 @@ class CodePageTest extends TestCase
      * @dataProvider providerCodePage
      *
      * @param mixed $expectedResult
+     * @param mixed $codePageIndex
      */
-    public function testCodePageNumberToName($expectedResult, ...$args)
+    public function testCodePageNumberToName($expectedResult, $codePageIndex): void
     {
-        $result = CodePage::numberToName(...$args);
-        self::assertEquals($expectedResult, $result);
+        if ($expectedResult === 'exception') {
+            $this->expectException(Exception::class);
+        }
+        $result = CodePage::numberToName($codePageIndex);
+        if (is_array($expectedResult)) {
+            self::assertContains($result, $expectedResult);
+        } else {
+            self::assertEquals($expectedResult, $result);
+        }
     }
 
-    public function providerCodePage()
+    public static function providerCodePage(): array
     {
-        return require 'data/Shared/CodePage.php';
+        return require 'tests/data/Shared/CodePage.php';
     }
 
-    public function testNumberToNameWithInvalidCodePage()
+    public function testCoverage(): void
+    {
+        $covered = [];
+        $expected = CodePage::getEncodings();
+        foreach ($expected as $key => $val) {
+            $covered[$key] = 0;
+        }
+        $tests = $this->providerCodePage();
+        foreach ($tests as $test) {
+            $covered[$test[1]] = 1;
+        }
+        foreach ($covered as $key => $val) {
+            self::assertEquals(1, $val, "Codepage $key not tested");
+        }
+    }
+
+    public function testNumberToNameWithInvalidCodePage(): void
     {
         $invalidCodePage = 12345;
 
@@ -35,10 +59,10 @@ class CodePageTest extends TestCase
 
             return;
         }
-        $this->fail('An expected exception has not been raised.');
+        self::fail('An expected exception has not been raised.');
     }
 
-    public function testNumberToNameWithUnsupportedCodePage()
+    public function testNumberToNameWithUnsupportedCodePage(): void
     {
         $unsupportedCodePage = 720;
 
@@ -49,6 +73,6 @@ class CodePageTest extends TestCase
 
             return;
         }
-        $this->fail('An expected exception has not been raised.');
+        self::fail('An expected exception has not been raised.');
     }
 }

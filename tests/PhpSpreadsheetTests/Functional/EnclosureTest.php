@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class EnclosureTest extends AbstractFunctional
 {
-    public function providerFormats()
+    public static function providerFormats(): array
     {
         return [
             ['Html'],
@@ -22,7 +22,7 @@ class EnclosureTest extends AbstractFunctional
      *
      * @param string $format
      */
-    public function testEnclosure($format)
+    public function testEnclosure($format): void
     {
         $value = '<img alt="" src="http://example.com/image.jpg" />';
 

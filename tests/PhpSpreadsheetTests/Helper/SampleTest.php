@@ -9,40 +9,27 @@ class SampleTest extends TestCase
 {
     /**
      * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @dataProvider providerSample
      *
-     * @param mixed $sample
+     * @preserveGlobalState disabled
+     *
+     * @dataProvider providerSample
      */
-    public function testSample($sample)
+    public function testSample(string $sample): void
     {
-        // Suppress output to console
-        $this->setOutputCallback(function () {
-        });
-
+        ob_start();
         require $sample;
+        ob_end_clean();
+
+        self::assertTrue(true);
     }
 
-    public function providerSample()
+    public static function providerSample(): array
     {
         $skipped = [
-            'Chart/32_Chart_read_write_PDF.php', // Unfortunately JpGraph is not up to date for latest PHP and raise many warnings
-            'Chart/32_Chart_read_write_HTML.php', // idem
         ];
 
-        // TCPDF does not support PHP 7.2
-        if (version_compare(PHP_VERSION, '7.2.0') >= 0) {
-            $skipped[] = 'Pdf/21_Pdf_TCPDF.php';
-        }
-
-        // DomPDF does not support PHP 7.3
-        if (version_compare(PHP_VERSION, '7.2.99') >= 0) {
-            $skipped[] = 'Basic/26_Utf8.php';
-            $skipped[] = 'Pdf/21_Pdf_Domdf.php';
-        }
-
-        // Unfortunately some tests are too long be ran with code-coverage
-        // analysis on Travis, so we need to exclude them
+        // Unfortunately some tests are too long to run with code-coverage
+        // analysis on GitHub Actions, so we need to exclude them
         global $argv;
         if (in_array('--coverage-clover', $argv)) {
             $tooLongToBeCovered = [
@@ -57,8 +44,8 @@ class SampleTest extends TestCase
         foreach ($helper->getSamples() as $samples) {
             foreach ($samples as $sample) {
                 if (!in_array($sample, $skipped)) {
-                    $file = '../samples/' . $sample;
-                    $result[] = [$file];
+                    $file = 'samples/' . $sample;
+                    $result[$sample] = [$file];
                 }
             }
         }

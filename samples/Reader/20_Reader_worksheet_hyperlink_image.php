@@ -1,5 +1,6 @@
 <?php
 
+use PhpOffice\PhpSpreadsheet\Shared\File;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 require __DIR__ . '/../Header.php';
@@ -12,6 +13,9 @@ $spreadsheet = new Spreadsheet();
 $aSheet = $spreadsheet->getActiveSheet();
 
 $gdImage = @imagecreatetruecolor(120, 20);
+if ($gdImage === false) {
+    throw new \Exception('imagecreatetruecolor failed');
+}
 $textColor = imagecolorallocate($gdImage, 255, 255, 255);
 imagestring($gdImage, 1, 5, 5, 'Created with PhpSpreadsheet', $textColor);
 
@@ -35,7 +39,7 @@ $helper->log('Write link: ' . $baseUrl);
 
 $drawing->setWorksheet($aSheet);
 
-$filename = tempnam(\PhpOffice\PhpSpreadsheet\Shared\File::sysGetTempDir(), 'phpspreadsheet-test');
+$filename = File::temporaryFilename();
 
 $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, $inputFileType);
 $writer->save($filename);

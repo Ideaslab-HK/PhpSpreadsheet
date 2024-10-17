@@ -16,14 +16,16 @@ $spreadsheet->getActiveSheet()->setCellValue('A1', '=B1')
     ->setCellValue('B1', '=A1+1')
     ->setCellValue('B2', '=A2');
 
-Calculation::getInstance($spreadsheet)->cyclicFormulaCount = 100;
+Calculation::getInstance($spreadsheet)->cyclicFormulaCount = 15;
 
 // Calculated data
 $helper->log('Calculated data');
 for ($row = 1; $row <= 2; ++$row) {
     for ($col = 'A'; $col != 'C'; ++$col) {
-        if ((($formula = $spreadsheet->getActiveSheet()->getCell($col . $row)->getValue()) !== null) &&
-                ($formula[0] == '=')) {
+        if (
+            (($formula = $spreadsheet->getActiveSheet()->getCell($col . $row)->getValue()) !== null) &&
+                ($formula[0] == '=')
+        ) {
             $helper->log('Value of ' . $col . $row . ' [' . $formula . ']: ' . $spreadsheet->getActiveSheet()->getCell($col . $row)->getCalculatedValue());
         }
     }

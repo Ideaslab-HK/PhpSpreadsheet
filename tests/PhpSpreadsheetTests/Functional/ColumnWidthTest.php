@@ -3,10 +3,11 @@
 namespace PhpOffice\PhpSpreadsheetTests\Functional;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\ColumnDimension;
 
 class ColumnWidthTest extends AbstractFunctional
 {
-    public function providerFormats()
+    public static function providerFormats(): array
     {
         return [
             ['Xlsx'],
@@ -15,10 +16,8 @@ class ColumnWidthTest extends AbstractFunctional
 
     /**
      * @dataProvider providerFormats
-     *
-     * @param $format
      */
-    public function testReadColumnWidth($format)
+    public function testReadColumnWidth(string $format): void
     {
         // create new sheet with column width
         $spreadsheet = new Spreadsheet();
@@ -31,13 +30,14 @@ class ColumnWidthTest extends AbstractFunctional
         $this->assertColumn($reloadedSpreadsheet);
     }
 
-    private function assertColumn(Spreadsheet $spreadsheet)
+    private function assertColumn(Spreadsheet $spreadsheet): void
     {
         $sheet = $spreadsheet->getActiveSheet();
         $columnDimensions = $sheet->getColumnDimensions();
 
         self::assertArrayHasKey('A', $columnDimensions);
         $column = array_shift($columnDimensions);
+        self::assertInstanceOf(ColumnDimension::class, $column);
         self::assertEquals(20, $column->getWidth());
     }
 }

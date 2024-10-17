@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class MergedCellsTest extends AbstractFunctional
 {
-    public function providerFormats()
+    public static function providerFormats(): array
     {
         return [
             ['Html'],
@@ -21,7 +21,7 @@ class MergedCellsTest extends AbstractFunctional
      *
      * @param string $format
      */
-    public function testMergedCells($format)
+    public function testMergedCells($format): void
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->setActiveSheetIndex(0);

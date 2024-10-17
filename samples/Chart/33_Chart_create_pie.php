@@ -4,10 +4,9 @@ use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
 use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
 use PhpOffice\PhpSpreadsheet\Chart\Layout;
-use PhpOffice\PhpSpreadsheet\Chart\Legend;
+use PhpOffice\PhpSpreadsheet\Chart\Legend as ChartLegend;
 use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 require __DIR__ . '/../Header.php';
@@ -16,12 +15,12 @@ $spreadsheet = new Spreadsheet();
 $worksheet = $spreadsheet->getActiveSheet();
 $worksheet->fromArray(
     [
-            ['', 2010, 2011, 2012],
-            ['Q1', 12, 15, 21],
-            ['Q2', 56, 73, 86],
-            ['Q3', 52, 61, 69],
-            ['Q4', 30, 32, 0],
-        ]
+        ['', 2010, 2011, 2012],
+        ['Q1', 12, 15, 21],
+        ['Q2', 56, 73, 86],
+        ['Q3', 52, 61, 69],
+        ['Q4', 30, 32, 0],
+    ]
 );
 
 // Set the Labels for each data series we want to plot
@@ -73,7 +72,7 @@ $layout1->setShowPercent(true);
 // Set the series in the plot area
 $plotArea1 = new PlotArea($layout1, [$series1]);
 // Set the chart legend
-$legend1 = new Legend(Legend::POSITION_RIGHT, null, false);
+$legend1 = new ChartLegend(ChartLegend::POSITION_RIGHT, null, false);
 
 $title1 = new Title('Test Pie Chart');
 
@@ -84,7 +83,7 @@ $chart1 = new Chart(
     $legend1, // legend
     $plotArea1, // plotArea
     true, // plotVisibleOnly
-    0, // displayBlanksAs
+    DataSeries::EMPTY_AS_GAP, // displayBlanksAs
     null, // xAxisLabel
     null   // yAxisLabel - Pie charts don't have a Y-Axis
 );
@@ -95,6 +94,8 @@ $chart1->setBottomRightPosition('H20');
 
 // Add the chart to the worksheet
 $worksheet->addChart($chart1);
+
+$helper->renderChart($chart1, __FILE__);
 
 // Set the Labels for each data series we want to plot
 //     Datatype
@@ -154,7 +155,7 @@ $chart2 = new Chart(
     null, // legend
     $plotArea2, // plotArea
     true, // plotVisibleOnly
-    0, // displayBlanksAs
+    DataSeries::EMPTY_AS_GAP, // displayBlanksAs
     null, // xAxisLabel
     null   // yAxisLabel - Like Pie charts, Donut charts don't have a Y-Axis
 );
@@ -166,10 +167,7 @@ $chart2->setBottomRightPosition('P20');
 // Add the chart to the worksheet
 $worksheet->addChart($chart2);
 
+$helper->renderChart($chart2, __FILE__);
+
 // Save Excel 2007 file
-$filename = $helper->getFilename(__FILE__);
-$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-$writer->setIncludeCharts(true);
-$callStartTime = microtime(true);
-$writer->save($filename);
-$helper->logWrite($writer, $filename, $callStartTime);
+$helper->write($spreadsheet, __FILE__, ['Xlsx'], true);

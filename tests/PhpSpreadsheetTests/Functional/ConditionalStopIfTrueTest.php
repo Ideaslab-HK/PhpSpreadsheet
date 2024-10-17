@@ -9,7 +9,7 @@ class ConditionalStopIfTrueTest extends AbstractFunctional
     const COLOR_GREEN = 'FF99FF66';
     const COLOR_RED = 'FFFF5050';
 
-    public function providerFormats()
+    public static function providerFormats(): array
     {
         return [
             ['Xlsx'],
@@ -21,7 +21,7 @@ class ConditionalStopIfTrueTest extends AbstractFunctional
      *
      * @param string $format
      */
-    public function testConditionalStopIfTrue($format)
+    public function testConditionalStopIfTrue($format): void
     {
         $pCoordinate = 'A1:A3';
 

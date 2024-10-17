@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class HyperlinkTest extends TestCase
 {
-    public function testGetUrl()
+    public function testGetUrl(): void
     {
         $urlValue = 'https://www.example.com';
 
@@ -17,7 +17,7 @@ class HyperlinkTest extends TestCase
         self::assertEquals($urlValue, $result);
     }
 
-    public function testSetUrl()
+    public function testSetUrl(): void
     {
         $initialUrlValue = 'https://www.example.com';
         $newUrlValue = 'http://github.com/PHPOffice/PhpSpreadsheet';
@@ -30,22 +30,22 @@ class HyperlinkTest extends TestCase
         self::assertEquals($newUrlValue, $result);
     }
 
-    public function testGetTooltip()
+    public function testGetTooltip(): void
     {
         $tooltipValue = 'PhpSpreadsheet Web Site';
 
-        $testInstance = new Hyperlink(null, $tooltipValue);
+        $testInstance = new Hyperlink('', $tooltipValue);
 
         $result = $testInstance->getTooltip();
         self::assertEquals($tooltipValue, $result);
     }
 
-    public function testSetTooltip()
+    public function testSetTooltip(): void
     {
         $initialTooltipValue = 'PhpSpreadsheet Web Site';
         $newTooltipValue = 'PhpSpreadsheet Repository on Github';
 
-        $testInstance = new Hyperlink(null, $initialTooltipValue);
+        $testInstance = new Hyperlink('', $initialTooltipValue);
         $result = $testInstance->setTooltip($newTooltipValue);
         self::assertInstanceOf(Hyperlink::class, $result);
 
@@ -53,7 +53,7 @@ class HyperlinkTest extends TestCase
         self::assertEquals($newTooltipValue, $result);
     }
 
-    public function testIsInternal()
+    public function testIsInternal(): void
     {
         $initialUrlValue = 'https://www.example.com';
         $newUrlValue = 'sheet://Worksheet1!A1';
@@ -67,7 +67,7 @@ class HyperlinkTest extends TestCase
         self::assertTrue($result);
     }
 
-    public function testGetHashCode()
+    public function testGetHashCode(): void
     {
         $urlValue = 'https://www.example.com';
         $tooltipValue = 'PhpSpreadsheet Web Site';

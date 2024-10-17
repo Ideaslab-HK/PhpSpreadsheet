@@ -7,21 +7,43 @@ use PHPUnit\Framework\TestCase;
 
 class StringHelperTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @var string
+     */
+    private $currencyCode;
+
+    /**
+     * @var string
+     */
+    private $decimalSeparator;
+
+    /**
+     * @var string
+     */
+    private $thousandsSeparator;
+
+    protected function setUp(): void
     {
         parent::setUp();
-
-        // Reset Currency Code
-        StringHelper::setCurrencyCode(null);
+        $this->currencyCode = StringHelper::getCurrencyCode();
+        $this->decimalSeparator = StringHelper::getDecimalSeparator();
+        $this->thousandsSeparator = StringHelper::getThousandsSeparator();
     }
 
-    public function testGetIsIconvEnabled()
+    protected function tearDown(): void
+    {
+        StringHelper::setCurrencyCode($this->currencyCode);
+        StringHelper::setDecimalSeparator($this->decimalSeparator);
+        StringHelper::setThousandsSeparator($this->thousandsSeparator);
+    }
+
+    public function testGetIsIconvEnabled(): void
     {
         $result = StringHelper::getIsIconvEnabled();
         self::assertTrue($result);
     }
 
-    public function testGetDecimalSeparator()
+    public function testGetDecimalSeparator(): void
     {
         $localeconv = localeconv();
 
@@ -30,7 +52,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testSetDecimalSeparator()
+    public function testSetDecimalSeparator(): void
     {
         $expectedResult = ',';
         StringHelper::setDecimalSeparator($expectedResult);
@@ -39,7 +61,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testGetThousandsSeparator()
+    public function testGetThousandsSeparator(): void
     {
         $localeconv = localeconv();
 
@@ -48,7 +70,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testSetThousandsSeparator()
+    public function testSetThousandsSeparator(): void
     {
         $expectedResult = ' ';
         StringHelper::setThousandsSeparator($expectedResult);
@@ -57,7 +79,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testGetCurrencyCode()
+    public function testGetCurrencyCode(): void
     {
         $localeconv = localeconv();
         $expectedResult = (!empty($localeconv['currency_symbol']) ? $localeconv['currency_symbol'] : (!empty($localeconv['int_curr_symbol']) ? $localeconv['int_curr_symbol'] : '$'));
@@ -65,7 +87,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testSetCurrencyCode()
+    public function testSetCurrencyCode(): void
     {
         $expectedResult = '£';
         StringHelper::setCurrencyCode($expectedResult);
@@ -74,7 +96,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testControlCharacterPHP2OOXML()
+    public function testControlCharacterPHP2OOXML(): void
     {
         $expectedResult = 'foo_x000B_bar';
         $result = StringHelper::controlCharacterPHP2OOXML('foo' . chr(11) . 'bar');
@@ -82,7 +104,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testControlCharacterOOXML2PHP()
+    public function testControlCharacterOOXML2PHP(): void
     {
         $expectedResult = 'foo' . chr(11) . 'bar';
         $result = StringHelper::controlCharacterOOXML2PHP('foo_x000B_bar');
@@ -90,7 +112,7 @@ class StringHelperTest extends TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testSYLKtoUTF8()
+    public function testSYLKtoUTF8(): void
     {
         $expectedResult = 'foo' . chr(11) . 'bar';
         $result = StringHelper::SYLKtoUTF8("foo\x1B ;bar");

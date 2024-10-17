@@ -2,47 +2,52 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowCellIterator;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PHPUnit\Framework\TestCase;
 
 class RowTest extends TestCase
 {
-    public $mockWorksheet;
-
-    public $mockRow;
-
-    public function setUp()
+    public function testInstantiateRowDefault(): void
     {
-        $this->mockWorksheet = $this->getMockBuilder(Worksheet::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mockWorksheet->expects($this->any())
-            ->method('getHighestColumn')
-            ->will($this->returnValue('E'));
-    }
-
-    public function testInstantiateRowDefault()
-    {
-        $row = new Row($this->mockWorksheet);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $row = new Row($sheet);
         self::assertInstanceOf(Row::class, $row);
         $rowIndex = $row->getRowIndex();
         self::assertEquals(1, $rowIndex);
+        $spreadsheet->disconnectWorksheets();
     }
 
-    public function testInstantiateRowSpecified()
+    public function testInstantiateRowSpecified(): void
     {
-        $row = new Row($this->mockWorksheet, 5);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $row = new Row($sheet, 5);
         self::assertInstanceOf(Row::class, $row);
         $rowIndex = $row->getRowIndex();
         self::assertEquals(5, $rowIndex);
+        $spreadsheet->disconnectWorksheets();
     }
 
-    public function testGetCellIterator()
+    public function testGetCellIterator(): void
     {
-        $row = new Row($this->mockWorksheet);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $row = new Row($sheet);
         $cellIterator = $row->getCellIterator();
         self::assertInstanceOf(RowCellIterator::class, $cellIterator);
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public function testGetColumnIterator(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $row = new Row($sheet);
+        $cellIterator = $row->getColumnIterator();
+        self::assertInstanceOf(RowCellIterator::class, $cellIterator);
+        $spreadsheet->disconnectWorksheets();
     }
 }

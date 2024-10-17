@@ -13,7 +13,7 @@ evaluates to the sum of values in A1, A2, ..., A10.
 To calculate a formula, you can call the cell containing the formula’s
 method `getCalculatedValue()`, for example:
 
-``` php
+```php
 $spreadsheet->getActiveSheet()->getCell('E11')->getCalculatedValue();
 ```
 
@@ -21,6 +21,13 @@ If you write the following line of code in the invoice demo included
 with PhpSpreadsheet, it evaluates to the value "64":
 
 ![09-command-line-calculation.png](./images/09-command-line-calculation.png)
+
+When writing a formula to a cell, formulae should always be set as they would appear in an English version of Microsoft Office Excel, and PhpSpreadsheet handles all formulae internally in this format. This means that the following rules hold:
+
+ - Decimal separator is `.` (period)
+ - Function argument separator is `,` (comma)
+ - Matrix row separator is `;` (semicolon)
+ - English function names must be used
 
 Another nice feature of PhpSpreadsheet's formula parser, is that it can
 automatically adjust a formula when inserting/removing rows/columns.
@@ -32,7 +39,7 @@ You see that the formula contained in cell E11 is "SUM(E4:E9)". Now,
 when I write the following line of code, two new product lines are
 added:
 
-``` php
+```php
 $spreadsheet->getActiveSheet()->insertNewRowBefore(7, 2);
 ```
 
@@ -42,6 +49,35 @@ Did you notice? The formula in the former cell E11 (now E13, as I
 inserted 2 new rows), changed to "SUM(E4:E11)". Also, the inserted cells
 duplicate style information of the previous cell, just like Excel's
 behaviour. Note that you can both insert rows and columns.
+
+If you want to "anchor" a specific cell for a formula, then you prefix the column and/or the row with a `$` symbol, exactly as you would in MS Excel itself.
+So if a formula contains "SUM(E$4:E9)", and you insert 2 new rows after row 1, the formula will be adjusted to read "SUM(E$4:E11)", with the `$` fixing row 4 as the start of the range.
+
+
+
+## Calculation Cache
+
+Once the Calculation engine has evaluated the formula in a cell, the result
+will be cached, so if you call `getCalculatedValue()` a second time for the
+same cell, the result will be returned from the cache rather than evaluating
+the formula a second time. This helps boost performance, because evaluating
+a formula is an expensive operation in terms of performance and speed.
+
+However, there may be times when you don't want this, perhaps you've changed
+the underlying data and need to re-evaluate the same formula with that new
+data.
+
+```php
+Calculation::getInstance($spreadsheet)->disableCalculationCache();
+```
+
+Will disable calculation caching, and flush the current calculation cache.
+
+If you want only to flush the cache, then you can call
+
+```php
+Calculation::getInstance($spreadsheet)->clearCalculationCache();
+```
 
 ## Known limitations
 
@@ -94,7 +130,7 @@ date values by calling the
 `\PhpOffice\PhpSpreadsheet\Calculation\Functions::setReturnDateType()`
 method:
 
-``` php
+```php
 \PhpOffice\PhpSpreadsheet\Calculation\Functions::setReturnDateType($returnDateType);
 ```
 
@@ -110,7 +146,7 @@ if an invalid value is passed in for the return date type).
 The `\PhpOffice\PhpSpreadsheet\Calculation\Functions::getReturnDateType()`
 method can be used to determine the current value of this setting:
 
-``` php
+```php
 $returnDateType = \PhpOffice\PhpSpreadsheet\Calculation\Functions::getReturnDateType();
 ```
 
@@ -148,7 +184,7 @@ It is possible for scripts to change the calendar used for calculating
 Excel date values by calling the
 `\PhpOffice\PhpSpreadsheet\Shared\Date::setExcelCalendar()` method:
 
-``` php
+```php
 \PhpOffice\PhpSpreadsheet\Shared\Date::setExcelCalendar($baseDate);
 ```
 
@@ -163,7 +199,7 @@ if an invalid value is passed in).
 The `\PhpOffice\PhpSpreadsheet\Shared\Date::getExcelCalendar()` method can
 be used to determine the current value of this setting:
 
-``` php
+```php
 $baseDate = \PhpOffice\PhpSpreadsheet\Shared\Date::getExcelCalendar();
 ```
 
@@ -285,6 +321,19 @@ and false is failure (e.g. an invalid DateTimeZone value was passed.)
 These functions support a timezone as an optional second parameter.
 This applies a specific timezone to that function call without affecting the default PhpSpreadsheet Timezone.
 
+### Calculating Value of Date/Time Read From Spreadsheet
+
+Nothing special needs to be done to interpret Date/Time values entered directly into a spreadsheet. They will have been stored as numbers with an appropriate number format set for the cell. However, depending on their value, they may have been stored as either integer or float values. If that is a problem, you can force `getCalculatedValue` to return float rather than int depending on the number format used for the cell.
+
+```php
+// All fields with Date, Time, or DateTime styles returned as float.
+\PhpOffice\PhpSpreadsheet\Cell\Cell::setCalculateDateTimeType(\PhpOffice\PhpSpreadsheet\Cell\Cell::CALCULATE_DATE_TIME_FLOAT);
+// All fields with Time or DateTime styles returned as float.
+\PhpOffice\PhpSpreadsheet\Cell\Cell::setCalculateDateTimeType(\PhpOffice\PhpSpreadsheet\Cell\Cell::CALCULATE_TIME_FLOAT);
+// Default - fields with Date, Time, or DateTime styles returned as they had been stored.
+\PhpOffice\PhpSpreadsheet\Cell\Cell::setCalculateDateTimeType(\PhpOffice\PhpSpreadsheet\Cell\Cell::CALCULATE_DATE_TIME_ASIS);
+```
+
 ## Function Reference
 
 ### Database Functions
@@ -329,7 +378,7 @@ This is the statistical mean.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -397,7 +446,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -432,7 +481,7 @@ has not yet been implemented in PhpSpreadsheet.
 
 #### DCOUNTA
 
-The DCOUNT function returns the count of cells that aren’t blank in a
+The DCOUNTA function returns the count of cells that aren’t blank in a
 column of a list or database and that match conditions that you specify.
 
 ##### Syntax
@@ -468,7 +517,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -539,7 +588,7 @@ in which you specify a condition for the column.
 
 #### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -607,7 +656,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -675,7 +724,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -743,7 +792,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -812,7 +861,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -881,7 +930,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -949,7 +998,7 @@ in which you specify a condition for the column.
 
 ##### Examples
 
-``` php
+```php
 $database = [
     [ 'Tree',  'Height', 'Age', 'Yield', 'Profit' ],
     [ 'Apple',  18,       20,    14,      105.00  ],
@@ -1050,7 +1099,7 @@ or an Excel timestamp value (real), depending on the value of
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Year')
     ->setCellValue('A2', 'Month')
     ->setCellValue('A3', 'Day');
@@ -1065,7 +1114,7 @@ $retVal = $worksheet->getCell('D1')->getCalculatedValue();
 // $retVal = 1230681600
 ```
 
-``` php
+```php
 // We're going to be calling the same cell calculation multiple times,
 //    and expecting different return values, so disable calculation cacheing
 \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance()->setCalculationCacheEnabled(FALSE);
@@ -1146,7 +1195,7 @@ the third parameter.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Year')
     ->setCellValue('A2', 'Month')
     ->setCellValue('A3', 'Day');
@@ -1184,7 +1233,7 @@ $retVal = $worksheet->getCell('D6')->getCalculatedValue();
 // $retVal = 30
 ```
 
-``` php
+```php
 $date1 = 1193317015; // PHP timestamp for 25-Oct-2007
 $date2 = 1449579415; // PHP timestamp for 8-Dec-2015
 
@@ -1255,7 +1304,7 @@ or an Excel timestamp value (real), depending on the value of
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String');
     ->setCellValue('A2', '31-Dec-2008')
     ->setCellValue('A3', '31/12/2008')
@@ -1277,7 +1326,7 @@ $retVal = $worksheet->getCell('B4')->getCalculatedValue();
 // $retVal = 39813.0 for all cases
 ```
 
-``` php
+```php
 // We're going to be calling the same cell calculation multiple times,
 //    and expecting different return values, so disable calculation cacheing
 \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance()->setCalculationCacheEnabled(FALSE);
@@ -1347,7 +1396,7 @@ This is an integer ranging from 1 to 31.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String')
     ->setCellValue('A2', '31-Dec-2008')
     ->setCellValue('A3', '14-Feb-2008');
@@ -1362,7 +1411,7 @@ $retVal = $worksheet->getCell('B3')->getCalculatedValue();
 // $retVal = 14
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'DAYOFMONTH'],
     ['25-Dec-2008']
@@ -1420,7 +1469,7 @@ day year.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('B1', 'Start Date')
     ->setCellValue('C1', 'End Date')
     ->setCellValue('A2', 'Year')
@@ -1445,7 +1494,7 @@ $retVal = $worksheet->getCell('E4')->getCalculatedValue();
 // $retVal = 1557
 ```
 
-``` php
+```php
 $date1 = 37655.0; // Excel timestamp for 25-Oct-2007
 $date2 = 39233.0; // Excel timestamp for 8-Dec-2015
 
@@ -1505,7 +1554,7 @@ or an Excel timestamp value (real), depending on the value of
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String')
     ->setCellValue('A2', '1-Jan-2008')
     ->setCellValue('A3', '29-Feb-2008');
@@ -1524,7 +1573,7 @@ $retVal = $worksheet->getCell('B3')->getCalculatedValue();
 // $retVal = 39141.0 (28-Feb-2007)
 ```
 
-``` php
+```php
 \PhpOffice\PhpSpreadsheet\Calculation\Functions::setReturnDateType(
     \PhpOffice\PhpSpreadsheet\Calculation\Functions::RETURNDATE_EXCEL
 );
@@ -1578,7 +1627,7 @@ or an Excel timestamp value (real), depending on the value of
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String')
     ->setCellValue('A2', '1-Jan-2000')
     ->setCellValue('A3', '14-Feb-2009');
@@ -1595,7 +1644,7 @@ $retVal = $worksheet->getCell('B3')->getCalculatedValue();
 // $retVal = 39507.0 (29-Feb-2008)
 ```
 
-``` php
+```php
 \PhpOffice\PhpSpreadsheet\Calculation\Functions::setReturnDateType(
     \PhpOffice\PhpSpreadsheet\Calculation\Functions::RETURNDATE_EXCEL
 );
@@ -1637,7 +1686,7 @@ This is an integer ranging from 0 to 23.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Time String')
     ->setCellValue('A2', '31-Dec-2008 17:30')
     ->setCellValue('A3', '14-Feb-2008 4:20 AM')
@@ -1657,7 +1706,7 @@ $retVal = $worksheet->getCell('B4')->getCalculatedValue();
 // $retVal = 16
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'HOUROFDAY'],
     ['09:30']
@@ -1695,7 +1744,7 @@ This is an integer ranging from 0 to 59.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Time String')
     ->setCellValue('A2', '31-Dec-2008 17:30')
     ->setCellValue('A3', '14-Feb-2008 4:20 AM')
@@ -1715,7 +1764,7 @@ $retVal = $worksheet->getCell('B4')->getCalculatedValue();
 // $retVal = 45
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'MINUTE'],
     ['09:30']
@@ -1753,7 +1802,7 @@ This is an integer ranging from 1 to 12.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String');
 $worksheet->setCellValue('A2', '31-Dec-2008');
 $worksheet->setCellValue('A3', '14-Feb-2008');
@@ -1768,7 +1817,7 @@ $retVal = $worksheet->getCell('B3')->getCalculatedValue();
 // $retVal = 2
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'MONTHOFYEAR'],
     ['14-July-2008']
@@ -1823,10 +1872,10 @@ The number of working days between startDate and endDate.
 
 ##### Examples
 
-``` php
+```php
 ```
 
-``` php
+```php
 ```
 
 ##### Notes
@@ -1856,10 +1905,10 @@ or an Excel timestamp value (real), depending on the value of
 
 ##### Examples
 
-``` php
+```php
 ```
 
-``` php
+```php
 ```
 
 ##### Notes
@@ -1893,7 +1942,7 @@ This is an integer ranging from 0 to 59.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Time String')
     ->setCellValue('A2', '31-Dec-2008 17:30:20')
     ->setCellValue('A3', '14-Feb-2008 4:20 AM')
@@ -1913,7 +1962,7 @@ $retVal = $worksheet->getCell('B4')->getCalculatedValue();
 // $retVal = 59
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'SECOND'],
     ['09:30:17']
@@ -1978,7 +2027,7 @@ value of method.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String')
     ->setCellValue('A2', '31-Dec-2008')
     ->setCellValue('A3', '14-Feb-2008');
@@ -1997,7 +2046,7 @@ $retVal = $worksheet->getCell('B4')->getCalculatedValue();
 // $retVal = 2
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'WEEKDAY'],
     ['14-July-2008']
@@ -2042,7 +2091,7 @@ This is an integer year value.
 
 ##### Examples
 
-``` php
+```php
 $worksheet->setCellValue('A1', 'Date String')
     ->setCellValue('A2', '17-Jul-1982')
     ->setCellValue('A3', '16-Apr-2009');
@@ -2057,7 +2106,7 @@ $retVal = $worksheet->getCell('B3')->getCalculatedValue();
 // $retVal = 2009
 ```
 
-``` php
+```php
 $retVal = call_user_func_array(
     ['\PhpOffice\PhpSpreadsheet\Calculation\Functions', 'YEAR'],
     ['14-July-2001']

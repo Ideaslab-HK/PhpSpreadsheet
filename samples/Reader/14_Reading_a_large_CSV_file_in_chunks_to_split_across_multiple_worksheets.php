@@ -2,13 +2,12 @@
 
 namespace Samples\Sample14;
 
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 require __DIR__ . '/../Header.php';
 
-$inputFileType = 'Csv';
 $inputFileName = __DIR__ . '/sampleData/example2.csv';
 
 /**  Define a Read Filter class implementing IReadFilter  */
@@ -24,13 +23,13 @@ class ChunkReadFilter implements IReadFilter
      * @param mixed $startRow
      * @param mixed $chunkSize
      */
-    public function setRows($startRow, $chunkSize)
+    public function setRows($startRow, $chunkSize): void
     {
         $this->startRow = $startRow;
         $this->endRow = $startRow + $chunkSize;
     }
 
-    public function readCell($column, $row, $worksheetName = '')
+    public function readCell($columnAddress, $row, $worksheetName = '')
     {
         //  Only read the heading row, and the rows that are configured in $this->_startRow and $this->_endRow
         if (($row == 1) || ($row >= $this->startRow && $row < $this->endRow)) {
@@ -41,9 +40,9 @@ class ChunkReadFilter implements IReadFilter
     }
 }
 
-$helper->log('Loading file ' . pathinfo($inputFileName, PATHINFO_BASENAME) . ' using IOFactory with a defined reader type of ' . $inputFileType);
+$helper->log('Loading file ' . /** @scrutinizer ignore-type */ pathinfo($inputFileName, PATHINFO_BASENAME) . ' using Csv reader');
 // Create a new Reader of the type defined in $inputFileType
-$reader = IOFactory::createReader($inputFileType);
+$reader = new Csv();
 
 // Define how many rows we want to read for each "chunk"
 $chunkSize = 100;
@@ -81,6 +80,8 @@ $loadedSheetNames = $spreadsheet->getSheetNames();
 foreach ($loadedSheetNames as $sheetIndex => $loadedSheetName) {
     $helper->log('<b>Worksheet #' . $sheetIndex . ' -> ' . $loadedSheetName . '</b>');
     $spreadsheet->setActiveSheetIndexByName($loadedSheetName);
-    $sheetData = $spreadsheet->getActiveSheet()->toArray(null, false, false, true);
-    var_dump($sheetData);
+
+    $activeRange = $spreadsheet->getActiveSheet()->calculateWorksheetDataDimension();
+    $sheetData = $spreadsheet->getActiveSheet()->rangeToArray($activeRange, null, true, true, true);
+    $helper->displayGrid($sheetData);
 }
