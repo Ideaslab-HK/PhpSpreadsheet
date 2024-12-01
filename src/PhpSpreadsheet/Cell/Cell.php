@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 
 class Cell
 {
@@ -226,6 +227,11 @@ class Cell
                 break;
             case DataType::TYPE_BOOL:
                 $this->value = (bool) $pValue;
+
+                break;
+            case DataType::TYPE_ISO_DATE:
+                $this->value = SharedDate::convertIsoDate($pValue);
+                $pDataType = DataType::TYPE_NUMERIC;
 
                 break;
             case DataType::TYPE_ERROR:

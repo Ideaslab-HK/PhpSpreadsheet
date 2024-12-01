@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTime;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use DateTime as PhpDateTime;
 
 class Date
 {
@@ -144,6 +145,36 @@ class Date
         }
 
         throw new \Exception('Invalid timezone');
+    }
+
+    /**
+     * @param mixed $value Converts a date/time in ISO-8601 standard format date string to an Excel
+     *                         serialized timestamp.
+     *                     See https://en.wikipedia.org/wiki/ISO_8601 for details of the ISO-8601 standard format.
+     */
+    public static function convertIsoDate($value)
+    {
+        if (!is_string($value)) {
+            throw new \Exception('Non-string value supplied for Iso Date conversion');
+        }
+
+        $date = new PhpDateTime($value);
+        $dateErrors = PhpDateTime::getLastErrors();
+
+        if (is_array($dateErrors) && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0)) {
+            throw new \Exception("Invalid string $value supplied for datatype Date");
+        }
+
+        $newValue = self::PHPToExcel($date);
+        if ($newValue === false) {
+            throw new \Exception("Invalid string $value supplied for datatype Date");
+        }
+
+        if (preg_match('/^\\s*\\d?\\d:\\d\\d(:\\d\\d([.]\\d+)?)?\\s*(am|pm)?\\s*$/i', $value) == 1) {
+            $newValue = fmod($newValue, 1.0);
+        }
+
+        return $newValue;
     }
 
     /**
