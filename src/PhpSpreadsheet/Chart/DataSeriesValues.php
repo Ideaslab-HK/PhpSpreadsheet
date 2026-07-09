@@ -74,9 +74,6 @@ class DataSeriesValues extends Properties
     /** @var TrendLine[] */
     private array $trendLines = [];
 
-	/** @var ?Layout */
-	private $labelLayout;
-
     /**
      * Create a new DataSeriesValues object.
      *
@@ -581,17 +578,5 @@ class DataSeriesValues extends Properties
             $this->trendLines[] = clone $trendLine;
         }
     }
-
-	public function getLabelLayout(): ?Layout
-	{
-		return $this->labelLayout;
-	}
-
-	public function setLabelLayout(?Layout $labelLayout): self
-	{
-		$this->labelLayout = $labelLayout;
-
-		return $this;
-	}
 
 }
