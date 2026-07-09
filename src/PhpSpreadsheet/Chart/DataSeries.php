@@ -46,6 +46,10 @@ class DataSeries
     const DEFAULT_EMPTY_AS = self::EMPTY_AS_GAP;
     const VALID_EMPTY_AS = [self::EMPTY_AS_GAP, self::EMPTY_AS_ZERO, self::EMPTY_AS_SPAN];
 
+    const VALUE_AXIS_POSITION_LEFT = 'l';
+	const VALUE_AXIS_POSITION_RIGHT = 'r';
+	const VALUE_AXIS_POSITION_TOP = 't';
+	const VALUE_AXIS_POSITION_BOTTOM = 'b';
     /**
      * Series Plot Type.
      */
@@ -106,6 +110,11 @@ class DataSeries
      */
     private array $plotBubbleSizes = [];
 
+	/**
+	 * Value Axis Position.
+	 */
+	private ?string $valueAxisPosition;
+
     /**
      * Create a new DataSeries.
      *
@@ -115,16 +124,17 @@ class DataSeries
      * @param DataSeriesValues[] $plotValues
      */
     public function __construct(
-        null|string $plotType = null,
-        null|string $plotGrouping = null,
-        array $plotOrder = [],
-        array $plotLabel = [],
-        array $plotCategory = [],
-        array $plotValues = [],
-        ?string $plotDirection = null,
-        bool $smoothLine = false,
-        ?string $plotStyle = null
-    ) {
+        null|string $plotType = null, 
+        null|string $plotGrouping = null, 
+        array $plotOrder = [], 
+        array $plotLabel = [], 
+        array $plotCategory = [], 
+        array $plotValues = [], 
+        ?string $plotDirection = null, 
+        bool $smoothLine = false, 
+        ?string $plotStyle = null, 
+        ?string $valueAxisPosition = null)
+    {
         $this->plotType = $plotType;
         $this->plotGrouping = $plotGrouping;
         $this->plotOrder = $plotOrder;
@@ -147,6 +157,13 @@ class DataSeries
             $plotDirection = self::DIRECTION_COL;
         }
         $this->plotDirection = $plotDirection;
+
+	    if ($valueAxisPosition === null) {
+		    $this->valueAxisPosition = self::VALUE_AXIS_POSITION_LEFT;
+	    }
+	    else {
+	    	$this->valueAxisPosition = $valueAxisPosition;
+	    }
     }
 
     /**
@@ -346,6 +363,16 @@ class DataSeries
         return count($this->plotValues);
     }
 
+	/**
+	 * Get Value Axis Position.
+	 *
+	 * @return string
+	 */
+	public function getValueAxisPosition(): string
+	{
+		return $this->valueAxisPosition;
+	}
+
     /**
      * Get Smooth Line.
      */
@@ -365,6 +392,20 @@ class DataSeries
 
         return $this;
     }
+
+	/**
+	 * Set Value Axis Position
+	 *
+	 * @param string $valueAxisPosition
+	 *
+	 * @return DataSeries
+	 */
+	public function setValueAxisPosition(string $valueAxisPosition): self
+	{
+		$this->valueAxisPosition = $valueAxisPosition;
+
+		return $this;
+	}
 
     public function refresh(Worksheet $worksheet): void
     {

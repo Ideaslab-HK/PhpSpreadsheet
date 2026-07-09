@@ -119,6 +119,10 @@ class Layout
         'anchor' => 'ctr',
     ];
 
+    private ?int $gapWidth = null;
+
+	private ?string $xAxisRotation = null;
+
     /**
      * Create a new Layout.
      *
@@ -194,6 +198,13 @@ class Layout
         $bodyPr = $layout['bodyPr'] ?? null;
         if (is_array($bodyPr)) {
             $this->setBodyPr($bodyPr);
+        }
+    
+        if (isset($layout['gapWidth'])) {
+        	$this->gapWidth = $layout['gapWidth'];
+        }
+        if (isset($layout['xAxisRotation'])) {
+        	$this->xAxisRotation = $layout['xAxisRotation'];
         }
     }
 
@@ -595,6 +606,22 @@ class Layout
         }
 
         return $this;
+    }
+
+    public function getGapWidth(): ?int {
+    	return $this->gapWidth;
+    }
+
+    public function setGapWidth(?int $value) {
+    	$this->gapWidth = $value;
+    }
+
+    public function getXAxisRotation(): ?string {
+    	return $this->xAxisRotation;
+    }
+
+    public function setXAxisRotation(?string $value) {
+    	$this->xAxisRotation = $value;
     }
 
     /**
