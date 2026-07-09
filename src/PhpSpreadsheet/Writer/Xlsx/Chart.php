@@ -503,7 +503,7 @@ class Chart extends WriterPart
         if (($chartType !== DataSeries::TYPE_PIECHART) && ($chartType !== DataSeries::TYPE_PIECHART_3D) && ($chartType !== DataSeries::TYPE_DONUTCHART)) {
             if ($chartType === DataSeries::TYPE_BUBBLECHART) {
                 // $this->writeValueAxis($objWriter, $xAxisLabel, $chartType, $id2, $id1, $catIsMultiLevelSeries, $xAxis ?? new Axis());
-                $this->writeValueAxis($objWriter, $xAxisLabel, $chartType, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis(), $majorGridlines, $minorGridlines, DataSeries::VALUE_AXIS_POSITION_LEFT);
+                $this->writeValueAxis($objWriter, $xAxisLabel, $chartType, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis(), DataSeries::VALUE_AXIS_POSITION_LEFT);
             } else {
                 // $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis());
                 $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $yAxis ?? new Axis(), $layout->getXAxisRotation(), DataSeries::VALUE_AXIS_POSITION_BOTTOM);
@@ -520,7 +520,7 @@ class Chart extends WriterPart
         }
 
         if ($useSecondaryYAxis) {
-		    $this->writeValueAxis($objWriter, $yAxisLabel, $chartType, $secondaryId1, $secondaryId2, $valIsMultiLevelSeries, $xAxis, $majorGridlines, $minorGridlines, DataSeries::VALUE_AXIS_POSITION_RIGHT);
+		    $this->writeValueAxis($objWriter, $yAxisLabel, $chartType, $secondaryId1, $secondaryId2, $valIsMultiLevelSeries, $xAxis, DataSeries::VALUE_AXIS_POSITION_RIGHT);
 		    $this->writeCategoryAxis($objWriter, $xAxisLabel, $secondaryId1, $secondaryId2, $catIsMultiLevelSeries, $yAxis, NULL, DataSeries::VALUE_AXIS_POSITION_TOP);
 	    }
 
@@ -593,7 +593,7 @@ class Chart extends WriterPart
 	 *
 	 * @return DataSeries|null
 	 */
-	private function getPlotGroupByChartType(PlotArea $plotArea, $chartType)
+	private function getPlotGroupByChartType(PlotArea $plotArea, string $chartType)
 	{
 
 		$groupCount = $plotArea->getPlotGroupCount();
@@ -613,9 +613,8 @@ class Chart extends WriterPart
      * @param XMLWriter $objWriter XML Writer
      * @param \PhpOffice\PhpSpreadsheet\Chart\Layout $chartLayout Chart layout
      * @param $chart_type
-     * @param $position
      */
-    private function writeDataLabels(XMLWriter $objWriter, Layout $chartLayout = null, $chart_type): void
+    private function writeDataLabels(XMLWriter $objWriter, Layout $chartLayout, string $chart_type): void
     {
         if (!isset($chartLayout)) {
             return;
@@ -730,7 +729,7 @@ class Chart extends WriterPart
     /**
      * Write Category Axis.
      */
-    private function writeCategoryAxis(XMLWriter $objWriter, ?Title $xAxisLabel, string $id1, string $id2, bool $isMultiLevelSeries, Axis $yAxis, string $xAxisRotation, string $axisPosition): void
+    private function writeCategoryAxis(XMLWriter $objWriter, ?Title $xAxisLabel, string $id1, string $id2, bool $isMultiLevelSeries, Axis $yAxis, ?string $xAxisRotation, string $axisPosition): void
     {
         // N.B. writeCategoryAxis may be invoked with the last parameter($yAxis) using $xAxis for ScatterChart, etc
         // In that case, xAxis may contain values like the yAxis, or it may be a date axis (LINECHART).
@@ -972,8 +971,8 @@ class Chart extends WriterPart
             }
         }
 
-        if ($isMultiLevelSeries || isset($xAxisRotation)) {
-//        if ($isMultiLevelSeries) {
+        // if ($isMultiLevelSeries || isset($xAxisRotation)) {
+       if ($isMultiLevelSeries) {
             $objWriter->startElement('c:noMultiLvlLbl');
             $objWriter->writeAttribute('val', '0');
             $objWriter->endElement();
@@ -986,7 +985,7 @@ class Chart extends WriterPart
      *
      * @param null|string $groupType Chart type
      */
-    private function writeValueAxis(XMLWriter $objWriter, ?Title $yAxisLabel, ?string $groupType, string $id1, string $id2, bool $isMultiLevelSeries, Axis $xAxis, GridLines $majorGridlines, GridLines $minorGridlines, $axisPosition): void
+    private function writeValueAxis(XMLWriter $objWriter, ?Title $yAxisLabel, ?string $groupType, string $id1, string $id2, bool $isMultiLevelSeries, Axis $xAxis, ?string $axisPosition = 'l'): void
     {
         $objWriter->startElement('c:' . Axis::AXIS_TYPE_VALUE);
         $majorGridlines = $xAxis->getMajorGridlines();
