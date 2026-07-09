@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MdeTermTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMDETERM
-     *
-     * @param mixed $expectedResult
-     * @param mixed $matrix expect a matrix
-     */
-    public function testMDETERM2($expectedResult, $matrix): void
+    /** @param array<mixed>|float|int|string $matrix */
+    #[DataProvider('providerMDETERM')]
+    public function testMDETERM2(float|int|string $expectedResult, array|int|float|string $matrix): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();

@@ -1,19 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Settings;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LowerTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerLOWER
-     *
-     * @param mixed $expectedResult
-     * @param mixed $str
-     */
-    public function testLOWER($expectedResult, $str = 'omitted'): void
+    #[DataProvider('providerLOWER')]
+    public function testLOWER(mixed $expectedResult, mixed $str = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -32,14 +30,8 @@ class LowerTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/LOWER.php';
     }
 
-    /**
-     * @dataProvider providerLocaleLOWER
-     *
-     * @param string $expectedResult
-     * @param mixed $value
-     * @param mixed $locale
-     */
-    public function testLowerWithLocaleBoolean($expectedResult, $locale, $value): void
+    #[DataProvider('providerLocaleLOWER')]
+    public function testLowerWithLocaleBoolean(string $expectedResult, string $locale, mixed $value): void
     {
         $newLocale = Settings::setLocale($locale);
         if ($newLocale === false) {
@@ -66,16 +58,15 @@ class LowerTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerLowerArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerLowerArray')]
     public function testLowerArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=LOWER({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerLowerArray(): array

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -8,14 +10,12 @@ use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class WeekNumTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $excelCalendar;
+    private int $excelCalendar;
 
     protected function setUp(): void
     {
@@ -31,40 +31,27 @@ class WeekNumTest extends TestCase
         SharedDate::setExcelCalendar($this->excelCalendar);
     }
 
-    /**
-     * @dataProvider providerWEEKNUM
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToWEEKNUM($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKNUM')]
+    public function testDirectCallToWEEKNUM(mixed $expectedResult, mixed ...$args): void
     {
-        /** @scrutinizer ignore-call */
         $result = Week::number(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWEEKNUM
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWEEKNUMAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKNUM')]
+    public function testWEEKNUMAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=WEEKNUM({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWEEKNUM
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWEEKNUMInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKNUM')]
+    public function testWEEKNUMInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -86,10 +73,8 @@ class WeekNumTest extends TestCase
         return require 'tests/data/Calculation/DateTime/WEEKNUM.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyWEEKNUM
-     */
-    public function testWEEKNUMUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyWEEKNUM')]
+    public function testWEEKNUMUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -114,16 +99,11 @@ class WeekNumTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerWEEKNUM1904
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWEEKNUMWith1904Calendar($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKNUM1904')]
+    public function testWEEKNUMWith1904Calendar(mixed $expectedResult, mixed ...$args): void
     {
         SharedDate::setExcelCalendar(SharedDate::CALENDAR_MAC_1904);
 
-        /** @scrutinizer ignore-call */
         $result = Week::number(...$args);
         self::assertSame($expectedResult, $result);
     }
@@ -133,15 +113,14 @@ class WeekNumTest extends TestCase
         return require 'tests/data/Calculation/DateTime/WEEKNUM1904.php';
     }
 
-    /**
-     * @dataProvider providerWeekNumArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerWeekNumArray')]
     public function testWeekNumArray(array $expectedResult, string $dateValues, string $methods): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=WEEKNUM({$dateValues}, {$methods})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

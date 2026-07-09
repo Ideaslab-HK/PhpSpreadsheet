@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Ods;
 
 use PhpOffice\PhpSpreadsheet\Reader\Ods;
@@ -69,6 +71,7 @@ class PageSetupBug1772Test extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
+    /** @return array<string, array<string, mixed>> */
     private function pageSetupAssertions(): array
     {
         return [
@@ -82,6 +85,7 @@ class PageSetupBug1772Test extends TestCase
         ];
     }
 
+    /** @return array<string, array<string, float>> */
     private function pageMarginAssertions(): array
     {
         return [

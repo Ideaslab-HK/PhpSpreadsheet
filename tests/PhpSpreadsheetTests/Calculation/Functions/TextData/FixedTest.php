@@ -1,20 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FixedTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerFIXED
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     * @param mixed $decimals
-     * @param mixed $noCommas
-     */
-    public function testFIXED($expectedResult, $number = 'omitted', $decimals = 'omitted', $noCommas = 'omitted'): void
+    #[DataProvider('providerFIXED')]
+    public function testFIXED(mixed $expectedResult, mixed $number = 'omitted', mixed $decimals = 'omitted', mixed $noCommas = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -42,16 +38,15 @@ class FixedTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/FIXED.php';
     }
 
-    /**
-     * @dataProvider providerFixedArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerFixedArray')]
     public function testFixedArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=FIXED({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerFixedArray(): array

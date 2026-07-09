@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class CothTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCOTH
-     *
-     * @param mixed $expectedResult
-     * @param mixed $angle
-     */
-    public function testCOTH($expectedResult, $angle): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCOTH')]
+    public function testCOTH(float|int|string $expectedResult, float|int|string $angle): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -30,15 +27,13 @@ class CothTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/COTH.php';
     }
 
-    /**
-     * @dataProvider providerCothArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCothArray')]
     public function testCothArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=COTH({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

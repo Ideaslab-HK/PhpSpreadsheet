@@ -1,56 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PhpOffice\PhpSpreadsheet\Calculation\CalculationParserOnly;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CalculationTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $compatibilityMode;
-
-    /**
-     * @var string
-     */
-    private $locale;
+    private string $compatibilityMode;
 
     protected function setUp(): void
     {
         $this->compatibilityMode = Functions::getCompatibilityMode();
-        $calculation = Calculation::getInstance();
-        $this->locale = $calculation->getLocale();
         Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
     }
 
     protected function tearDown(): void
     {
         Functions::setCompatibilityMode($this->compatibilityMode);
-        $calculation = Calculation::getInstance();
-        $calculation->setLocale($this->locale);
     }
 
-    /**
-     * @dataProvider providerBinaryComparisonOperation
-     *
-     * @param mixed $formula
-     * @param mixed $expectedResultExcel
-     * @param mixed $expectedResultOpenOffice
-     */
-    public function testBinaryComparisonOperation($formula, $expectedResultExcel, $expectedResultOpenOffice): void
+    #[DataProvider('providerBinaryComparisonOperation')]
+    public function testBinaryComparisonOperation(string $formula, mixed $expectedResultExcel, mixed $expectedResultOpenOffice): void
     {
         Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $resultExcel = Calculation::getInstance()->_calculateFormulaValue($formula);
+        $resultExcel = Calculation::getInstance()->calculateFormula($formula);
         self::assertEquals($expectedResultExcel, $resultExcel, 'should be Excel compatible');
 
         Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
-        $resultOpenOffice = Calculation::getInstance()->_calculateFormulaValue($formula);
+        $resultOpenOffice = Calculation::getInstance()->calculateFormula($formula);
         self::assertEquals($expectedResultOpenOffice, $resultOpenOffice, 'should be OpenOffice compatible');
     }
 
@@ -66,12 +53,14 @@ class CalculationTest extends TestCase
         $tree = $calculation->parseFormula('=_xlfn.ISFORMULA(A1)');
         self::assertIsArray($tree);
         self::assertCount(3, $tree);
+        /** @var mixed[] */
         $function = $tree[2];
         self::assertEquals('Function', $function['type']);
 
         $tree = $calculation->parseFormula('=_xlfn.STDEV.S(A1:B2)');
         self::assertIsArray($tree);
         self::assertCount(5, $tree);
+        /** @var mixed[] */
         $function = $tree[4];
         self::assertEquals('Function', $function['type']);
     }
@@ -96,6 +85,7 @@ class CalculationTest extends TestCase
         $cell = $sheet->getCell('F6');
         $cell->setValue('=OFFSET(D3, -1, -2)');
         self::assertEquals(5, $cell->getCalculatedValue(), 'missing arguments should be filled with null');
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellSetAsQuotedText(): void
@@ -116,6 +106,21 @@ class CalculationTest extends TestCase
         $cell3 = $workSheet->getCell('A3');
         $cell3->setValueExplicit('=', DataType::TYPE_FORMULA);
         self::assertEquals('', $cell3->getCalculatedValue());
+
+        $cell4 = $workSheet->getCell('A4');
+
+        try {
+            $cell4->setValueExplicit((object) null, DataType::TYPE_FORMULA);
+            self::fail('setValueExplicit formula with unstringable object should have thrown exception');
+        } catch (SpreadsheetException $e) {
+            self::assertStringContainsString('Unable to convert to string', $e->getMessage());
+        }
+
+        $cell5 = $workSheet->getCell('A5');
+        $cell5->setValueExplicit(null, DataType::TYPE_FORMULA);
+        self::assertEquals('', $cell5->getCalculatedValue());
+
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithDdeExpresion(): void
@@ -127,6 +132,7 @@ class CalculationTest extends TestCase
         $cell->setValue("=cmd|'/C calc'!A0");
 
         self::assertEquals("=cmd|'/C calc'!A0", $cell->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testFormulaReferencingWorksheetWithEscapedApostrophe(): void
@@ -145,6 +151,7 @@ class CalculationTest extends TestCase
 
         $cellValue = $workSheet->getCell('A2')->getCalculatedValue();
         self::assertSame('HELLO WORLD', $cellValue);
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testFormulaReferencingWorksheetWithUnescapedApostrophe(): void
@@ -163,6 +170,7 @@ class CalculationTest extends TestCase
 
         $cellValue = $workSheet->getCell('A2')->getCalculatedValue();
         self::assertSame('HELLO WORLD', $cellValue);
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithFormulaTwoIndirect(): void
@@ -179,6 +187,7 @@ class CalculationTest extends TestCase
         $cell3->setValue('=SUM(INDIRECT("A"&ROW()),INDIRECT("B"&ROW()),INDIRECT("C"&ROW()))');
 
         self::assertEquals('9', $cell3->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithStringNumeric(): void
@@ -191,6 +200,7 @@ class CalculationTest extends TestCase
         $cell2->setValue('=100*A1');
 
         self::assertSame(250.0, $cell2->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithStringFraction(): void
@@ -203,6 +213,7 @@ class CalculationTest extends TestCase
         $cell2->setValue('=100*A1');
 
         self::assertSame(75.0, $cell2->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithStringPercentage(): void
@@ -215,6 +226,7 @@ class CalculationTest extends TestCase
         $cell2->setValue('=100*A1');
 
         self::assertSame(2.0, $cell2->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testCellWithStringCurrency(): void
@@ -229,6 +241,7 @@ class CalculationTest extends TestCase
         $cell2->setValue('=100*A1');
 
         self::assertSame(200.0, $cell2->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testBranchPruningFormulaParsingSimpleCase(): void
@@ -244,17 +257,18 @@ class CalculationTest extends TestCase
         $foundEqualAssociatedToStoreKey = false;
         $foundConditionalOnB1 = false;
         foreach ($tokens as $token) {
+            /** @var mixed[] $token */
             $isBinaryOperator = $token['type'] == 'Binary Operator';
             $isEqual = $token['value'] == '=';
             $correctStoreKey = ($token['storeKey'] ?? '') == 'storeKey-0';
             $correctOnlyIf = ($token['onlyIf'] ?? '') == 'storeKey-0';
             $isB1Reference = ($token['reference'] ?? '') == 'B1';
 
-            $foundEqualAssociatedToStoreKey = $foundEqualAssociatedToStoreKey ||
-                ($isBinaryOperator && $isEqual && $correctStoreKey);
+            $foundEqualAssociatedToStoreKey = $foundEqualAssociatedToStoreKey
+                || ($isBinaryOperator && $isEqual && $correctStoreKey);
 
-            $foundConditionalOnB1 = $foundConditionalOnB1 ||
-                ($isB1Reference && $correctOnlyIf);
+            $foundConditionalOnB1 = $foundConditionalOnB1
+                || ($isB1Reference && $correctOnlyIf);
         }
         self::assertTrue($foundEqualAssociatedToStoreKey);
         self::assertTrue($foundConditionalOnB1);
@@ -274,14 +288,15 @@ class CalculationTest extends TestCase
         $plusGotTagged = false;
         $productFunctionCorrectlyTagged = false;
         foreach ($tokens as $token) {
+            /** @var mixed[] $token */
             $isBinaryOperator = $token['type'] == 'Binary Operator';
             $isPlus = $token['value'] == '+';
             $anyStoreKey = isset($token['storeKey']);
             $anyOnlyIf = isset($token['onlyIf']);
             $anyOnlyIfNot = isset($token['onlyIfNot']);
-            $plusGotTagged = $plusGotTagged ||
-                ($isBinaryOperator && $isPlus &&
-                    ($anyStoreKey || $anyOnlyIfNot || $anyOnlyIf));
+            $plusGotTagged = $plusGotTagged
+                || ($isBinaryOperator && $isPlus
+                    && ($anyStoreKey || $anyOnlyIfNot || $anyOnlyIf));
 
             $isFunction = $token['type'] == 'Function';
             $isProductFunction = $token['value'] == 'PRODUCT(';
@@ -306,6 +321,7 @@ class CalculationTest extends TestCase
         $notFunctionCorrectlyTagged = false;
         $findOneOperandCountTagged = false;
         foreach ($tokens as $token) {
+            /** @var mixed[] $token */
             $value = $token['value'];
             $isPlus = $value == '+';
             $isProductFunction = $value == 'PRODUCT(';
@@ -334,7 +350,7 @@ class CalculationTest extends TestCase
         // this used to raise a parser error, we keep it even though we don't
         // test the output
         $calculation->parseFormula($formula);
-        self::assertTrue(true);
+        self::assertSame(1, $calculation->cyclicFormulaCount);
     }
 
     public function testBranchPruningFormulaParsingInequalitiesConditionsCase(): void
@@ -348,34 +364,32 @@ class CalculationTest extends TestCase
 
         $properlyTaggedPlus = false;
         foreach ($tokens as $token) {
+            /** @var mixed[] $token */
             $isPlus = $token['value'] === '+';
             $hasOnlyIf = !empty($token['onlyIf']);
 
-            $properlyTaggedPlus = $properlyTaggedPlus ||
-                ($isPlus && $hasOnlyIf);
+            $properlyTaggedPlus = $properlyTaggedPlus
+                || ($isPlus && $hasOnlyIf);
         }
         self::assertTrue($properlyTaggedPlus);
     }
 
     /**
-     * @param mixed $expectedResult
-     * @param mixed $dataArray
-     * @param string $formula
+     * @param mixed[] $dataArray
      * @param string $cellCoordinates where to put the formula
      * @param string[] $shouldBeSetInCacheCells coordinates of cells that must
      *  be set in cache
      * @param string[] $shouldNotBeSetInCacheCells coordinates of cells that must
      *  not be set in cache because of pruning
-     *
-     * @dataProvider dataProviderBranchPruningFullExecution
      */
+    #[DataProvider('dataProviderBranchPruningFullExecution')]
     public function testFullExecutionDataPruning(
-        $expectedResult,
-        $dataArray,
-        $formula,
-        $cellCoordinates,
-        $shouldBeSetInCacheCells = [],
-        $shouldNotBeSetInCacheCells = []
+        mixed $expectedResult,
+        array $dataArray,
+        string $formula,
+        string $cellCoordinates,
+        array $shouldBeSetInCacheCells = [],
+        array $shouldNotBeSetInCacheCells = []
     ): void {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -404,10 +418,34 @@ class CalculationTest extends TestCase
         $calculation->disableBranchPruning();
         $calculated = $cell->getCalculatedValue();
         self::assertEquals($expectedResult, $calculated);
+        $spreadsheet->disconnectWorksheets();
     }
 
     public static function dataProviderBranchPruningFullExecution(): array
     {
         return require 'tests/data/Calculation/Calculation.php';
+    }
+
+    public function testBranchPruningFlag(): void
+    {
+        $calc1 = Calculation::getInstance();
+        $calc2 = CalculationParserOnly::getParserInstance();
+        self::assertNotSame($calc1, $calc2);
+        $calc1a = Calculation::getInstance();
+        $calc2a = CalculationParserOnly::getParserInstance();
+        self::assertSame($calc1, $calc1a);
+        self::assertSame($calc2, $calc2a);
+
+        self::assertFalse($calc2->getBranchPruningEnabled());
+        $calc2->enableBranchPruning();
+        self::assertFalse($calc2->getBranchPruningEnabled(), 'no change for ParserOnly');
+        $calc2->disableBranchPruning();
+        self::assertFalse($calc2->getBranchPruningEnabled());
+
+        self::assertTrue($calc1->getBranchPruningEnabled(), 'parserOnly did not affect Calculation singleton');
+        $calc1->disableBranchPruning();
+        self::assertFalse($calc1->getBranchPruningEnabled());
+        $calc1->enableBranchPruning();
+        self::assertTrue($calc1->getBranchPruningEnabled());
     }
 }

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Database;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PHPUnit\Framework\TestCase;
@@ -12,15 +15,9 @@ class SetupTeardownDatabases extends TestCase
 {
     protected const RESULT_CELL = 'Z1';
 
-    /**
-     * @var ?Spreadsheet
-     */
-    private $spreadsheet;
+    private ?Spreadsheet $spreadsheet = null;
 
-    /**
-     * @var ?Worksheet
-     */
-    private $sheet;
+    private ?Worksheet $sheet = null;
 
     protected function setUp(): void
     {
@@ -37,6 +34,7 @@ class SetupTeardownDatabases extends TestCase
         Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
     }
 
+    /** @return mixed[][] */
     protected static function database1(): array
     {
         return [
@@ -50,6 +48,7 @@ class SetupTeardownDatabases extends TestCase
         ];
     }
 
+    /** @return mixed[][] */
     protected static function database2(): array
     {
         return [
@@ -73,6 +72,7 @@ class SetupTeardownDatabases extends TestCase
         ];
     }
 
+    /** @return mixed[][] */
     protected static function database3(): array
     {
         return [
@@ -92,6 +92,7 @@ class SetupTeardownDatabases extends TestCase
         ];
     }
 
+    /** @return mixed[][] */
     protected static function database3FilledIn(): array
     {
         // same as database3 except two omitted scores are filled in
@@ -133,9 +134,10 @@ class SetupTeardownDatabases extends TestCase
     }
 
     /**
-     * @param int|string $field
+     * @param mixed[] $database
+     * @param mixed[][] $criteria
      */
-    public function prepareWorksheetWithFormula(string $functionName, array $database, $field, array $criteria): void
+    public function prepareWorksheetWithFormula(string $functionName, array $database, null|int|string $field, array $criteria): void
     {
         $sheet = $this->getSheet();
         $maxCol = '';
@@ -144,11 +146,12 @@ class SetupTeardownDatabases extends TestCase
         $startRow = 1;
         $row = $startRow;
         foreach ($database as $dataRow) {
+            /** @var mixed[] $dataRow */
             $col = $startCol;
             foreach ($dataRow as $dataCell) {
                 $sheet->getCell("$col$row")->setValue($dataCell);
                 $maxCol = max($col, $maxCol);
-                ++$col;
+                StringHelper::stringIncrement($col);
             }
             $maxRow = $row;
             ++$row;
@@ -160,13 +163,14 @@ class SetupTeardownDatabases extends TestCase
         $startRow = 1;
         $row = $startRow;
         foreach ($criteria as $dataRow) {
+            /** @var mixed[] $dataRow */
             $col = $startCol;
             foreach ($dataRow as $dataCell) {
                 if ($dataCell !== null) {
                     $sheet->getCell("$col$row")->setValueExplicit($dataCell, DataType::TYPE_STRING);
                 }
                 $maxCol = max($col, $maxCol);
-                ++$col;
+                StringHelper::stringIncrement($col);
             }
             $maxRow = $row;
             ++$row;

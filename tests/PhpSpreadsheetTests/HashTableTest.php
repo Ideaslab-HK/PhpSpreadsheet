@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests;
 
 use PhpOffice\PhpSpreadsheet\Comment; // need Comparable object
@@ -8,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class HashTableTest extends TestCase
 {
+    /** @return array{Comment, Comment} */
     public static function createArray(): array
     {
         $comment1 = new Comment();
@@ -18,10 +21,7 @@ class HashTableTest extends TestCase
         return [$comment1, $comment2];
     }
 
-    /**
-     * @param mixed $comment
-     */
-    public static function getAuthor($comment): string
+    public static function getAuthor(mixed $comment): string
     {
         return ($comment instanceof Comment) ? $comment->getAuthor() : '';
     }

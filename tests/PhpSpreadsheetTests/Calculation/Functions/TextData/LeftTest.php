@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Settings;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LeftTest extends AllSetupTeardown
 {
     /**
-     * @dataProvider providerLEFT
-     *
-     * @param mixed $expectedResult
      * @param mixed $str string from which to extract
      * @param mixed $cnt number of characters to extract
      */
-    public function testLEFT($expectedResult, $str = 'omitted', $cnt = 'omitted'): void
+    #[DataProvider('providerLEFT')]
+    public function testLEFT(mixed $expectedResult, mixed $str = 'omitted', mixed $cnt = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -38,15 +39,8 @@ class LeftTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/LEFT.php';
     }
 
-    /**
-     * @dataProvider providerLocaleLEFT
-     *
-     * @param string $expectedResult
-     * @param mixed $value
-     * @param mixed $locale
-     * @param mixed $characters
-     */
-    public function testLowerWithLocaleBoolean($expectedResult, $locale, $value, $characters): void
+    #[DataProvider('providerLocaleLEFT')]
+    public function testLowerWithLocaleBoolean(string $expectedResult, string $locale, mixed $value, mixed $characters): void
     {
         $newLocale = Settings::setLocale($locale);
         if ($newLocale === false) {
@@ -75,9 +69,7 @@ class LeftTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeLEFTTrue
-     */
+    #[DataProvider('providerCalculationTypeLEFTTrue')]
     public function testCalculationTypeTrue(string $type, string $resultB1, string $resultB2): void
     {
         Functions::setCompatibilityMode($type);
@@ -111,9 +103,7 @@ class LeftTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeLEFTFalse
-     */
+    #[DataProvider('providerCalculationTypeLEFTFalse')]
     public function testCalculationTypeFalse(string $type, string $resultB1, string $resultB2): void
     {
         Functions::setCompatibilityMode($type);
@@ -147,9 +137,7 @@ class LeftTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeLEFTNull
-     */
+    #[DataProvider('providerCalculationTypeLEFTNull')]
     public function testCalculationTypeNull(string $type, string $resultB1, string $resultB2): void
     {
         Functions::setCompatibilityMode($type);
@@ -182,16 +170,15 @@ class LeftTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerLeftArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerLeftArray')]
     public function testLeftArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=LEFT({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerLeftArray(): array

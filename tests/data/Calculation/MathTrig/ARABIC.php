@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     [
         0,
@@ -56,5 +58,13 @@ return [
     [
         '#VALUE!',
         'WRONG',
+    ],
+    [
+        0,
+        '',
+    ],
+    [
+        '#NUM!',
+        '-',
     ],
 ];

@@ -1,19 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class PowerTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerPOWER
-     *
-     * @param mixed $expectedResult
-     * @param mixed $base
-     * @param mixed $exponent
-     */
-    public function testPOWER($expectedResult, $base = 'omitted', $exponent = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPOWER')]
+    public function testPOWER(mixed $expectedResult, mixed $base = 'omitted', mixed $exponent = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -39,15 +35,13 @@ class PowerTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/POWER.php';
     }
 
-    /**
-     * @dataProvider providerPowerArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPowerArray')]
     public function testPowerArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=POWER({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

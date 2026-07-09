@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 class ProductTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerPRODUCT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testPRODUCT($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPRODUCT')]
+    public function testPRODUCT(mixed $expectedResult, mixed ...$args): void
     {
         $sheet = $this->getSheet();
         $row = 0;

@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class AtanTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerAtan
-     *
-     * @param mixed $expectedResult
-     */
-    public function testAtan($expectedResult, string $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAtan')]
+    public function testAtan(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +24,13 @@ class AtanTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ATAN.php';
     }
 
-    /**
-     * @dataProvider providerAtanArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAtanArray')]
     public function testAtanArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ATAN({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

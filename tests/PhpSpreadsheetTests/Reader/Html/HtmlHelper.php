@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Html;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -16,13 +18,27 @@ class HtmlHelper
         return $filename;
     }
 
-    public static function loadHtmlIntoSpreadsheet(string $filename, bool $unlink = false): Spreadsheet
+    public static function loadHtmlIntoSpreadsheet(string $filename, bool $unlink = false, ?bool $allowExternalImages = null): Spreadsheet
     {
         $html = new Html();
+        if ($allowExternalImages !== null) {
+            $html->setAllowExternalImages($allowExternalImages);
+        }
         $spreadsheet = $html->load($filename);
         if ($unlink) {
             unlink($filename);
         }
+
+        return $spreadsheet;
+    }
+
+    public static function loadHtmlStringIntoSpreadsheet(string $content, ?bool $allowExternalImages = null): Spreadsheet
+    {
+        $html = new Html();
+        if ($allowExternalImages !== null) {
+            $html->setAllowExternalImages($allowExternalImages);
+        }
+        $spreadsheet = $html->loadFromString($content);
 
         return $spreadsheet;
     }

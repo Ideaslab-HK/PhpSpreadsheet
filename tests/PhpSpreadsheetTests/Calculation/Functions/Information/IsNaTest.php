@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Information;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IsNaTest extends TestCase
@@ -14,12 +17,8 @@ class IsNaTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @dataProvider providerIsNa
-     *
-     * @param mixed $value
-     */
-    public function testIsNa(bool $expectedResult, $value): void
+    #[DataProvider('providerIsNa')]
+    public function testIsNa(bool $expectedResult, mixed $value): void
     {
         $result = ErrorValue::isNa($value);
         self::assertEquals($expectedResult, $result);
@@ -30,16 +29,14 @@ class IsNaTest extends TestCase
         return require 'tests/data/Calculation/Information/IS_NA.php';
     }
 
-    /**
-     * @dataProvider providerIsNaArray
-     */
+    #[DataProvider('providerIsNaArray')]
     public function testIsNaArray(array $expectedResult, string $values): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ISNA({$values})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerIsNaArray(): array

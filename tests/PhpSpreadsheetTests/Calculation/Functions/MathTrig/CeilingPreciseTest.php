@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class CeilingPreciseTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerFLOORPRECISE
-     *
-     * @param mixed $expectedResult
-     * @param string $formula
-     */
-    public function testCEILINGPRECISE($expectedResult, $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFLOORPRECISE')]
+    public function testCEILINGPRECISE(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -30,15 +27,13 @@ class CeilingPreciseTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/CEILINGPRECISE.php';
     }
 
-    /**
-     * @dataProvider providerCeilingArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCeilingArray')]
     public function testCeilingArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=CEILING.PRECISE({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
+use DateTimeInterface;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\TimeValue;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class TimeValueTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $returnDateType;
+    private string $returnDateType;
 
     protected function setUp(): void
     {
@@ -31,40 +32,27 @@ class TimeValueTest extends TestCase
         Functions::setReturnDateType($this->returnDateType);
     }
 
-    /**
-     * @dataProvider providerTIMEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToTIMEVALUE($expectedResult, ...$args): void
+    #[DataProvider('providerTIMEVALUE')]
+    public function testDirectCallToTIMEVALUE(int|float|string $expectedResult, bool|int|string $value): void
     {
-        /** @scrutinizer ignore-call */
-        $result = TimeValue::fromString(...$args);
+        $result = TimeValue::fromString($value);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-8);
     }
 
-    /**
-     * @dataProvider providerTIMEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testTIMEVALUEAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerTIMEVALUE')]
+    public function testTIMEVALUEAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=TIMEVALUE({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-8);
     }
 
-    /**
-     * @dataProvider providerTIMEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testTIMEVALUEInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerTIMEVALUE')]
+    public function testTIMEVALUEInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -86,6 +74,15 @@ class TimeValueTest extends TestCase
         return require 'tests/data/Calculation/DateTime/TIMEVALUE.php';
     }
 
+    public function testRefArgNull(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->getCell('A1')->setValue('=TIMEVALUE(B1)');
+        self::assertSame('#VALUE!', $sheet->getCell('A1')->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
+    }
+
     public function testTIMEVALUEtoUnixTimestamp(): void
     {
         Functions::setReturnDateType(Functions::RETURNDATE_UNIX_TIMESTAMP);
@@ -101,17 +98,14 @@ class TimeValueTest extends TestCase
 
         $result = TimeValue::fromString('7:30:20');
         //    Must return an object...
-        self::assertIsObject($result);
         //    ... of the correct type
-        self::assertTrue(is_a($result, 'DateTimeInterface'));
+        self::assertInstanceOf(DateTimeInterface::class, $result);
         //    ... with the correct value
         self::assertEquals($result->format('H:i:s'), '07:30:20');
     }
 
-    /**
-     * @dataProvider providerUnhappyTIMEVALUE
-     */
-    public function testTIMEVALUEUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyTIMEVALUE')]
+    public function testTIMEVALUEUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -136,15 +130,14 @@ class TimeValueTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerTimeValueArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerTimeValueArray')]
     public function testTimeValueArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=TIMEVALUE({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

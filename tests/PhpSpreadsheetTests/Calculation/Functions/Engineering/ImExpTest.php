@@ -1,76 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ComplexFunctions;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
 use PhpOffice\PhpSpreadsheetTests\Custom\ComplexAssert;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImExpTest extends TestCase
+class ImExpTest extends ComplexAssert
 {
-    const COMPLEX_PRECISION = 1E-12;
+    protected float $complexPrecision = (PHP_INT_SIZE > 4) ? 1E-12 : 1E-9;
 
-    /**
-     * @var ComplexAssert
-     */
-    private $complexAssert;
-
-    protected function setUp(): void
+    #[DataProvider('providerIMEXP')]
+    public function testDirectCallToIMEXP(string $expectedResult, string $arg): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $this->complexAssert = new ComplexAssert();
+        $result = ComplexFunctions::IMEXP($arg);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMEXP
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToIMEXP($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
-        $result = ComplexFunctions::IMEXP(...$args);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
-    }
-
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerIMEXP
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMEXPAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerIMEXP')]
+    public function testIMEXPAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=IMEXP({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $this->trimIfQuoted((string) $result), self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMEXP
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMEXPInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerIMEXP')]
+    public function testIMEXPInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -82,10 +49,7 @@ class ImExpTest extends TestCase
         $result = $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        $this->assertComplexEquals($expectedResult, $result);
 
         $spreadsheet->disconnectWorksheets();
     }
@@ -95,10 +59,8 @@ class ImExpTest extends TestCase
         return require 'tests/data/Calculation/Engineering/IMEXP.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyIMEXP
-     */
-    public function testIMEXPUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyIMEXP')]
+    public function testIMEXPUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -123,15 +85,13 @@ class ImExpTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerImExpArray
-     */
+    #[DataProvider('providerImExpArray')]
     public function testImExpArray(array $expectedResult, string $complex): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=IMEXP({$complex})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

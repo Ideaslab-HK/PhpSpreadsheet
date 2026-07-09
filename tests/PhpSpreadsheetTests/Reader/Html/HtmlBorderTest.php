@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Html;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -22,8 +24,7 @@ class HtmlBorderTest extends TestCase
                         <td style="border: dotted #333333;"></td>
                     </tr>
                 </table>';
-        $filename = HtmlHelper::createHtml($html);
-        $spreadsheet = HtmlHelper::loadHtmlIntoSpreadsheet($filename, true);
+        $spreadsheet = HtmlHelper::loadHtmlStringIntoSpreadsheet($html);
         $firstSheet = $spreadsheet->getSheet(0);
         $style = $firstSheet->getCell('A1')->getStyle();
         $borders = $style->getBorders();
@@ -76,9 +77,7 @@ class HtmlBorderTest extends TestCase
         self::assertEquals('333333', $border->getColor()->getRGB());
     }
 
-    /**
-     * @dataProvider providerBorderStyle
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBorderStyle')]
     public function testBorderStyle(string $style, string $expectedResult): void
     {
         $borders = Html::getBorderMappings();
@@ -94,6 +93,7 @@ class HtmlBorderTest extends TestCase
         }
         $tests = $this->providerBorderStyle();
         foreach ($tests as $test) {
+            /** @var array<int, int|string> $test */
             $covered[$test[0]] = 1;
         }
         foreach ($covered as $key => $val) {

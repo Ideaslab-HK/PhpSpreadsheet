@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class AsinhTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerAsinh
-     *
-     * @param mixed $expectedResult
-     */
-    public function testAsinh($expectedResult, string $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAsinh')]
+    public function testAsinh(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +24,13 @@ class AsinhTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ASINH.php';
     }
 
-    /**
-     * @dataProvider providerAsinhArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAsinhArray')]
     public function testAsinhArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ASINH({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

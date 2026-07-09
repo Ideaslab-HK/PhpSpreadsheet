@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     [
         'Mark Baker',
@@ -24,6 +26,10 @@ return [
     [
         'False',
         false,
+    ],
+    'error code unchanged' => [
+        '#VALUE!',
+        '#VALUE!',
     ],
     'no argument' => ['exception'],
 ];

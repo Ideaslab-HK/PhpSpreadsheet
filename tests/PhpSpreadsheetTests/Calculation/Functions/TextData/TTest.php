@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class TTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerT
-     *
-     * @param mixed $expectedResult
-     * @param mixed $value
-     */
-    public function testT($expectedResult, $value = 'no arguments'): void
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerT')]
+    public function testT(mixed $expectedResult, mixed $value = 'no arguments'): void
     {
         $this->mightHaveException($expectedResult);
         if ($value === 'no arguments') {
@@ -30,15 +29,14 @@ class TTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/T.php';
     }
 
-    /**
-     * @dataProvider providerTArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerTArray')]
     public function testTArray(array $expectedResult, string $argument): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=T({$argument})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 

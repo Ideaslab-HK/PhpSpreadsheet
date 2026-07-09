@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class OddTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerODD
-     *
-     * @param mixed $expectedResult
-     * @param mixed $value
-     */
-    public function testODD($expectedResult, $value): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerODD')]
+    public function testODD(int|string $expectedResult, float|int|string $value): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +23,13 @@ class OddTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ODD.php';
     }
 
-    /**
-     * @dataProvider providerOddArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerOddArray')]
     public function testOddArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ODD({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

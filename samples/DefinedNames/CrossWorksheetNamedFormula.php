@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 require_once __DIR__ . '/../Header.php';
-
+/** @var PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 $spreadsheet = new Spreadsheet();
 
 $data2019 = [
@@ -40,7 +40,8 @@ setYearlyData($worksheet, '2020', $data2020);
 $worksheet = $spreadsheet->addSheet(new Worksheet($spreadsheet));
 setYearlyData($worksheet, '2020', [], 'GROWTH');
 
-function setYearlyData(Worksheet $worksheet, string $year, $yearlyData, ?string $title = null): void
+/** @param array<int, array<int, int>> $yearlyData */
+function setYearlyData(Worksheet $worksheet, string $year, array $yearlyData, ?string $title = null): void
 {
     // Set up some basic data
     $worksheetTitle = $title ?: $year;

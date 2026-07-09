@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class RowTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerROW
-     *
-     * @param mixed $expectedResult
-     * @param null|array|string $cellReference
-     */
-    public function testROW($expectedResult, $cellReference = null): void
+    /** @param null|mixed[][]|string $cellReference */
+    #[DataProvider('providerROW')]
+    public function testROW(mixed $expectedResult, null|array|string $cellReference = null): void
     {
         $result = LookupRef\RowColumnInformation::ROW($cellReference);
         self::assertSame($expectedResult, $result);

@@ -1,35 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Database;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Database\DMin;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DMinTest extends SetupTeardownDatabases
 {
     /**
-     * @dataProvider providerDMin
-     *
-     * @param mixed $expectedResult
-     * @param mixed $database
-     * @param mixed $field
-     * @param mixed $criteria
+     * @param mixed[] $database
+     * @param mixed[][] $criteria
      */
-    public function testDirectCallToDMin($expectedResult, $database, $field, $criteria): void
+    #[DataProvider('providerDMin')]
+    public function testDirectCallToDMin(int|float|string $expectedResult, array $database, string|null|int $field, array $criteria): void
     {
         $result = DMin::evaluate($database, $field, $criteria);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-12);
     }
 
     /**
-     * @dataProvider providerDMin
-     *
-     * @param mixed $expectedResult
-     * @param mixed $database
-     * @param mixed $field
-     * @param mixed $criteria
+     * @param mixed[] $database
+     * @param mixed[][] $criteria
      */
-    public function testDMinAsWorksheetFormula($expectedResult, $database, $field, $criteria): void
+    #[DataProvider('providerDMin')]
+    public function testDMinAsWorksheetFormula(int|float|string $expectedResult, array $database, string|null|int $field, array $criteria): void
     {
         $this->prepareWorksheetWithFormula('DMIN', $database, $field, $criteria);
 

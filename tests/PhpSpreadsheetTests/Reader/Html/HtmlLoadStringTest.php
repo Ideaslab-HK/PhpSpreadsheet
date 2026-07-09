@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Html;
 
-use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PHPUnit\Framework\TestCase;
 
@@ -38,17 +39,7 @@ class HtmlLoadStringTest extends TestCase
         self::assertStringContainsString("\n", $cellValue);
     }
 
-    public function testLoadInvalidString(): void
-    {
-        if (method_exists($this, 'setOutputCallback')) {
-            $this->expectException(ReaderException::class);
-            $html = '<table<>';
-            (new Html())->loadFromString($html);
-        } else {
-            // The meat of this test runs in HtmlPhpunit10Test
-            self::assertTrue(true);
-        }
-    }
+    // testLoadInvalidString moved to HtmlPhpUnit10Test
 
     public function testCanLoadFromStringIntoExistingSpreadsheet(): void
     {
@@ -104,7 +95,7 @@ class HtmlLoadStringTest extends TestCase
             </body>
             </html>
             EOF;
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
+        $reader = new Html();
         $spreadsheet = $reader->loadFromString($html);
         $reader->setSheetIndex(1);
         $reader->loadFromString($html, $spreadsheet);

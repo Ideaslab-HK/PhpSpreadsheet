@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class CoshTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCosh
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCosh($expectedResult, string $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCosh')]
+    public function testCosh(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +24,13 @@ class CoshTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/COSH.php';
     }
 
-    /**
-     * @dataProvider providerCoshArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCoshArray')]
     public function testCoshArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=COSH({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

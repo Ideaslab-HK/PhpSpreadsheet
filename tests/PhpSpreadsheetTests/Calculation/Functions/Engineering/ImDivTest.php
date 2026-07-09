@@ -1,76 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ComplexOperations;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
 use PhpOffice\PhpSpreadsheetTests\Custom\ComplexAssert;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImDivTest extends TestCase
+class ImDivTest extends ComplexAssert
 {
-    const COMPLEX_PRECISION = 1E-12;
-
-    /**
-     * @var ComplexAssert
-     */
-    private $complexAssert;
-
-    protected function setUp(): void
+    #[DataProvider('providerIMDIV')]
+    public function testDirectCallToIMDIV(string $expectedResult, string $dividend, string $divisor): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $this->complexAssert = new ComplexAssert();
+        $result = ComplexOperations::IMDIV($dividend, $divisor);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMDIV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToIMDIV($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
-        $result = ComplexOperations::IMDIV(...$args);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
-    }
-
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerIMDIV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMDIVAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerIMDIV')]
+    public function testIMDIVAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=IMDIV({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $this->trimIfQuoted((string) $result), self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMDIV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMDIVInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerIMDIV')]
+    public function testIMDIVInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -82,10 +47,7 @@ class ImDivTest extends TestCase
         $result = $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        $this->assertComplexEquals($expectedResult, $result);
 
         $spreadsheet->disconnectWorksheets();
     }
@@ -95,10 +57,8 @@ class ImDivTest extends TestCase
         return require 'tests/data/Calculation/Engineering/IMDIV.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyIMDIV
-     */
-    public function testIMDIVUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyIMDIV')]
+    public function testIMDIVUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -124,15 +84,13 @@ class ImDivTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerImDivArray
-     */
+    #[DataProvider('providerImDivArray')]
     public function testImDivArray(array $expectedResult, string $dividend, string $divisor): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=IMDIV({$dividend}, {$divisor})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

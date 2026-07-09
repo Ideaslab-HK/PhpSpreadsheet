@@ -1,22 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Settings;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MidTest extends AllSetupTeardown
 {
     /**
-     * @dataProvider providerMID
-     *
-     * @param mixed $expectedResult
      * @param mixed $str string from which to extract
      * @param mixed $start position at which to start
      * @param mixed $cnt number of characters to extract
      */
-    public function testMID($expectedResult, $str = 'omitted', $start = 'omitted', $cnt = 'omitted'): void
+    #[DataProvider('providerMID')]
+    public function testMID(mixed $expectedResult, mixed $str = 'omitted', mixed $start = 'omitted', mixed $cnt = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -44,16 +45,8 @@ class MidTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/MID.php';
     }
 
-    /**
-     * @dataProvider providerLocaleMID
-     *
-     * @param string $expectedResult
-     * @param mixed $value
-     * @param mixed $locale
-     * @param mixed $offset
-     * @param mixed $characters
-     */
-    public function testMiddleWithLocaleBoolean($expectedResult, $locale, $value, $offset, $characters): void
+    #[DataProvider('providerLocaleMID')]
+    public function testMiddleWithLocaleBoolean(string $expectedResult, string $locale, mixed $value, mixed $offset, mixed $characters): void
     {
         $newLocale = Settings::setLocale($locale);
         if ($newLocale === false) {
@@ -83,9 +76,7 @@ class MidTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeMIDTrue
-     */
+    #[DataProvider('providerCalculationTypeMIDTrue')]
     public function testCalculationTypeTrue(string $type, string $resultB1, string $resultB2, string $resultB3): void
     {
         Functions::setCompatibilityMode($type);
@@ -124,10 +115,8 @@ class MidTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeMIDFalse
-     */
-    public function testCalculationTypeFalse(string $type, string $resultB1, string $resultB2): void
+    #[DataProvider('providerCalculationTypeMIDFalse')]
+    public function testCalculationTypeFalse(string $type, string $resultB1, string $resultB2, string $resultB3): void
     {
         Functions::setCompatibilityMode($type);
         $sheet = $this->getSheet();
@@ -138,6 +127,7 @@ class MidTest extends AllSetupTeardown
         $this->setCell('B3', '=MID(A2, 2, A1)');
         self::assertEquals($resultB1, $sheet->getCell('B1')->getCalculatedValue());
         self::assertEquals($resultB2, $sheet->getCell('B2')->getCalculatedValue());
+        self::assertEquals($resultB3, $sheet->getCell('B3')->getCalculatedValue());
     }
 
     public static function providerCalculationTypeMIDFalse(): array
@@ -164,9 +154,7 @@ class MidTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerCalculationTypeMIDNull
-     */
+    #[DataProvider('providerCalculationTypeMIDNull')]
     public function testCalculationTypeNull(string $type, string $resultB1, string $resultB2, string $resultB3): void
     {
         Functions::setCompatibilityMode($type);
@@ -204,16 +192,15 @@ class MidTest extends AllSetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerMidArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerMidArray')]
     public function testMidArray(array $expectedResult, string $argument1, string $argument2, string $argument3): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MID({$argument1}, {$argument2}, {$argument3})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerMidArray(): array

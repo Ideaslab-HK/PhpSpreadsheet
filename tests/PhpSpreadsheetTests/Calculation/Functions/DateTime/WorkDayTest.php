@@ -1,48 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\WorkDay;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class WorkDayTest extends TestCase
 {
-    /**
-     * @dataProvider providerWORKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToWORKDAY($expectedResult, ...$args): void
+    #[DataProvider('providerWORKDAY')]
+    public function testDirectCallToWORKDAY(mixed $expectedResult, mixed ...$args): void
     {
         $result = WorkDay::date(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWORKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWORKDAYAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerWORKDAY')]
+    public function testWORKDAYAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=WORKDAY({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWORKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWORKDAYInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerWORKDAY')]
+    public function testWORKDAYInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -64,10 +55,8 @@ class WorkDayTest extends TestCase
         return require 'tests/data/Calculation/DateTime/WORKDAY.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyWORKDAY
-     */
-    public function testWORKDAYUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyWORKDAY')]
+    public function testWORKDAYUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -92,9 +81,8 @@ class WorkDayTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerWorkDayArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerWorkDayArray')]
     public function testWorkDayArray(array $expectedResult, string $startDate, string $endDays, ?string $holidays): void
     {
         $calculation = Calculation::getInstance();
@@ -104,7 +92,7 @@ class WorkDayTest extends TestCase
         } else {
             $formula = "=WORKDAY({$startDate}, {$endDays}, {$holidays})";
         }
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

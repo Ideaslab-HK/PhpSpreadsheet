@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 class MaxIfsTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMAXIFS
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMAXIFS($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMAXIFS')]
+    public function testMAXIFS(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCaseNoBracket('MAXIFS', $expectedResult, ...$args);
     }

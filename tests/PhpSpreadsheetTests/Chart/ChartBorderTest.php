@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Chart;
 
 use PhpOffice\PhpSpreadsheet\Chart\Properties;
@@ -19,6 +21,7 @@ class ChartBorderTest extends AbstractFunctional
     public function writeCharts(XlsxWriter $writer): void
     {
         $writer->setIncludeCharts(true);
+        $writer->setUseDiskCaching(true, sys_get_temp_dir());
     }
 
     public function testChartBorder(): void

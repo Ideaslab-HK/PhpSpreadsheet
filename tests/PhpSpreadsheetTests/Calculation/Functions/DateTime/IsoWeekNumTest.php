@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -8,14 +10,12 @@ use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IsoWeekNumTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $excelCalendar;
+    private int $excelCalendar;
 
     protected function setUp(): void
     {
@@ -31,42 +31,27 @@ class IsoWeekNumTest extends TestCase
         SharedDate::setExcelCalendar($this->excelCalendar);
     }
 
-    /**
-     * @dataProvider providerISOWEEKNUM
-     *
-     * @param mixed $expectedResult
-     * @param mixed ...$args
-     */
-    public function testDirectCallToISOWEEKNUM($expectedResult, ...$args): void
+    #[DataProvider('providerISOWEEKNUM')]
+    public function testDirectCallToISOWEEKNUM(mixed $expectedResult, mixed ...$args): void
     {
-        /** @scrutinizer ignore-call */
         $result = Week::isoWeekNumber(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerISOWEEKNUM
-     *
-     * @param mixed $expectedResult
-     * @param mixed ...$args
-     */
-    public function testISOWEEKNUMAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerISOWEEKNUM')]
+    public function testISOWEEKNUMAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=ISOWEEKNUM({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerISOWEEKNUM
-     *
-     * @param mixed $expectedResult
-     */
-    public function testISOWEEKNUMInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerISOWEEKNUM')]
+    public function testISOWEEKNUMInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -88,10 +73,8 @@ class IsoWeekNumTest extends TestCase
         return require 'tests/data/Calculation/DateTime/ISOWEEKNUM.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyISOWEEKNUM
-     */
-    public function testISOWEEKNUMUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyISOWEEKNUM')]
+    public function testISOWEEKNUMUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -112,20 +95,15 @@ class IsoWeekNumTest extends TestCase
     public static function providerUnhappyISOWEEKNUM(): array
     {
         return [
-            ['Formula Error: Wrong number of arguments for ISOWEEKNUM() function', 2023, 03],
+            ['Formula Error: Wrong number of arguments for ISOWEEKNUM() function', 2023, 3],
         ];
     }
 
-    /**
-     * @dataProvider providerISOWEEKNUM1904
-     *
-     * @param mixed $expectedResult
-     */
-    public function testISOWEEKNUMWith1904Calendar($expectedResult, ...$args): void
+    #[DataProvider('providerISOWEEKNUM1904')]
+    public function testISOWEEKNUMWith1904Calendar(mixed $expectedResult, mixed ...$args): void
     {
         SharedDate::setExcelCalendar(SharedDate::CALENDAR_MAC_1904);
 
-        /** @scrutinizer ignore-call */
         $result = Week::isoWeekNumber(...$args);
         self::assertSame($expectedResult, $result);
     }
@@ -135,15 +113,14 @@ class IsoWeekNumTest extends TestCase
         return require 'tests/data/Calculation/DateTime/ISOWEEKNUM1904.php';
     }
 
-    /**
-     * @dataProvider providerIsoWeekNumArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerIsoWeekNumArray')]
     public function testIsoWeekNumArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ISOWEEKNUM({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'global $e$2-$e$6' => [1, 'namedrangex'],
     'global $f$2:$h$2' => [3, 'namedrangey'],
@@ -15,5 +17,5 @@ return [
     'unknown name' => ['#NAME?', 'namedrange2'],
     'unknown name as first part of range' => ['#NAME?', 'Invalid:A2'],
     'unknown name as second part of range' => ['#NAME?', 'A2:Invalid'],
-    //'qualified out of scope $f$6:$h$6' => [3, 'OtherSheet!localname'], // needs investigation
+    'qualified out of scope $f$6:$h$6' => [3, 'OtherSheet!localname'],
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -9,14 +11,12 @@ use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class Hex2DecTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $compatibilityMode;
+    private string $compatibilityMode;
 
     protected function setUp(): void
     {
@@ -28,45 +28,28 @@ class Hex2DecTest extends TestCase
         Functions::setCompatibilityMode($this->compatibilityMode);
     }
 
-    /**
-     * @dataProvider providerHEX2DEC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToHEX2DEC($expectedResult, ...$args): void
+    #[DataProvider('providerHEX2DEC')]
+    public function testDirectCallToHEX2DEC(mixed $expectedResult, bool|float|int|string $value): void
     {
-        /** @scrutinizer ignore-call */
-        $result = ConvertHex::toDecimal(...$args);
+        $result = ConvertHex::toDecimal($value);
         self::assertSame($expectedResult, $result);
     }
 
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerHEX2DEC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testHEX2DECAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerHEX2DEC')]
+    public function testHEX2DECAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=HEX2DEC({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame($expectedResult, $this->trimIfQuoted((string) $result));
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerHEX2DEC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testHEX2DECInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerHEX2DEC')]
+    public function testHEX2DECInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -88,10 +71,8 @@ class Hex2DecTest extends TestCase
         return require 'tests/data/Calculation/Engineering/HEX2DEC.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyHEX2DEC
-     */
-    public function testHEX2DECUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyHEX2DEC')]
+    public function testHEX2DECUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -116,17 +97,14 @@ class Hex2DecTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerHEX2DECOds
-     *
-     * @param mixed $expectedResult
-     */
-    public function testHEX2DECOds($expectedResult, ...$args): void
+    #[DataProvider('providerHEX2DECOds')]
+    public function testHEX2DECOds(mixed $expectedResult, bool|float|int|string $value): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
+        Functions::setCompatibilityMode(
+            Functions::COMPATIBILITY_OPENOFFICE
+        );
 
-        /** @scrutinizer ignore-call */
-        $result = ConvertHex::toDecimal(...$args);
+        $result = ConvertHex::toDecimal($value);
         self::assertSame($expectedResult, $result);
     }
 
@@ -140,28 +118,35 @@ class Hex2DecTest extends TestCase
         $calculation = Calculation::getInstance();
         $formula = '=HEX2DEC(10.1)';
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_GNUMERIC);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame('16', $this->trimIfQuoted((string) $result), 'Gnumeric');
+        Functions::setCompatibilityMode(
+            Functions::COMPATIBILITY_GNUMERIC
+        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame(16, $result, 'Gnumeric');
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame(ExcelError::NAN(), $this->trimIfQuoted((string) $result), 'OpenOffice');
+        Functions::setCompatibilityMode(
+            Functions::COMPATIBILITY_OPENOFFICE
+        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame(ExcelError::NAN(), $result, 'OpenOffice');
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame(ExcelError::NAN(), $this->trimIfQuoted((string) $result), 'Excel');
+        Functions::setCompatibilityMode(
+            Functions::COMPATIBILITY_EXCEL
+        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame(ExcelError::NAN(), $result, 'Excel');
     }
 
-    /**
-     * @dataProvider providerHex2DecArray
-     */
+    #[DataProvider('providerHex2DecArray')]
     public function testHex2DecArray(array $expectedResult, string $value): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=HEX2DEC({$value})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

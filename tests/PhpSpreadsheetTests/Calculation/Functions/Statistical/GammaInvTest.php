@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class GammaInvTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerGAMMAINV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGAMMAINV($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGAMMAINV')]
+    public function testGAMMAINV(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('GAMMA.INV', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class GammaInvTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/GAMMAINV.php';
     }
 
-    /**
-     * @dataProvider providerGammaInvArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGammaInvArray')]
     public function testGammaInvArray(array $expectedResult, string $values, string $alpha, string $beta): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=GAMMA.INV({$values}, {$alpha}, {$beta})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

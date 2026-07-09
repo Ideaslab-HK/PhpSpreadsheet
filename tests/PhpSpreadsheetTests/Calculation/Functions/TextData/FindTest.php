@@ -1,20 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FindTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerFIND
-     *
-     * @param mixed $expectedResult
-     * @param mixed $string1
-     * @param mixed $string2
-     * @param mixed $start
-     */
-    public function testFIND($expectedResult, $string1 = 'omitted', $string2 = 'omitted', $start = 'omitted'): void
+    #[DataProvider('providerFIND')]
+    public function testFIND(mixed $expectedResult, mixed $string1 = 'omitted', mixed $string2 = 'omitted', mixed $start = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -42,16 +38,15 @@ class FindTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/FIND.php';
     }
 
-    /**
-     * @dataProvider providerFindArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerFindArray')]
     public function testFindArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=FIND({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerFindArray(): array

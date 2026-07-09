@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Chart;
 
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
@@ -79,7 +81,7 @@ class Issue2931Test extends TestCase
             '<c:view3D><c:rotX val="90"/><c:rotY val="0"/><c:rAngAx val="0"/><c:perspective val="0"/></c:view3D>',
         ];
         $expectedXml3D = [
-            '<c:view3D/>',
+            'c:view3D', // empty view3d no longer generated
         ];
         $expectedXmlNoX = [
             'c:grouping',
@@ -100,7 +102,7 @@ class Issue2931Test extends TestCase
         $data = $writerChart->writeChart($chart);
         // confirm that file contains expected tags
         foreach ($expectedXml3D as $expected) {
-            self::assertSame(1, substr_count($data, $expected), $expected);
+            self::assertSame(0, substr_count($data, $expected), $expected);
         }
         foreach ($expectedXmlNoX as $expected) {
             self::assertSame(0, substr_count($data, $expected), $expected);

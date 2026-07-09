@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class AcosTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerAcos
-     *
-     * @param mixed $expectedResult
-     */
-    public function testAcos($expectedResult, string $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAcos')]
+    public function testAcos(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +24,13 @@ class AcosTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ACOS.php';
     }
 
-    /**
-     * @dataProvider providerAcosArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAcosArray')]
     public function testAcosArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ACOS({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

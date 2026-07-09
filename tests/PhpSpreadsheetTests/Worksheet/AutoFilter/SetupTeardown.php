@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet\AutoFilter;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -8,20 +10,11 @@ use PHPUnit\Framework\TestCase;
 
 class SetupTeardown extends TestCase
 {
-    /**
-     * @var ?Spreadsheet
-     */
-    private $spreadsheet;
+    private ?Spreadsheet $spreadsheet = null;
 
-    /**
-     * @var ?Worksheet
-     */
-    private $sheet;
+    private ?Worksheet $sheet = null;
 
-    /**
-     * @var int
-     */
-    protected $maxRow = 4;
+    protected int $maxRow = 4;
 
     protected function tearDown(): void
     {
@@ -52,17 +45,19 @@ class SetupTeardown extends TestCase
         return $this->sheet;
     }
 
+    /** @return int[] */
     public function getVisible(): array
     {
         return $this->getVisibleSheet($this->getSheet());
     }
 
+    /** @return int[] */
     public function getVisibleSheet(Worksheet $sheet): array
     {
         $sheet->getAutoFilter()->showHideRows();
         $actualVisible = [];
         for ($row = 2; $row <= $this->maxRow; ++$row) {
-            if ($sheet->getRowDimension($row)->getVisible()) {
+            if ($sheet->isRowVisible($row)) {
                 $actualVisible[] = $row;
             }
         }

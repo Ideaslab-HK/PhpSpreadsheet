@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SumXMY2Test extends AllSetupTeardown
 {
     /**
-     * @dataProvider providerSUMXMY2
-     *
-     * @param mixed $expectedResult
+     * @param mixed[] $matrixData1
+     * @param mixed[] $matrixData2
      */
-    public function testSUMXMY2($expectedResult, array $matrixData1, array $matrixData2): void
+    #[DataProvider('providerSUMXMY2')]
+    public function testSUMXMY2(mixed $expectedResult, array $matrixData1, array $matrixData2): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();

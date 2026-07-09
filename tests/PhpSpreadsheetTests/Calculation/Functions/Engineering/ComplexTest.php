@@ -1,54 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\Complex;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ComplexTest extends TestCase
 {
-    /**
-     * @dataProvider providerCOMPLEX
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToCOMPLEX($expectedResult, ...$args): void
+    #[DataProvider('providerCOMPLEX')]
+    public function testDirectCallToCOMPLEX(mixed $expectedResult, mixed ...$args): void
     {
-        /** @scrutinizer ignore-call */
         $result = Complex::complex(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerCOMPLEX
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCOMPLEXAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerCOMPLEX')]
+    public function testCOMPLEXAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=COMPLEX({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame($expectedResult, $this->trimIfQuoted((string) $result));
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerCOMPLEX
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCOMPLEXInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerCOMPLEX')]
+    public function testCOMPLEXInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -70,15 +56,14 @@ class ComplexTest extends TestCase
         return require 'tests/data/Calculation/Engineering/COMPLEX.php';
     }
 
-    /**
-     * @dataProvider providerComplexArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerComplexArray')]
     public function testComplexArray(array $expectedResult, string $real, string $imaginary): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=COMPLEX({$real}, {$imaginary})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

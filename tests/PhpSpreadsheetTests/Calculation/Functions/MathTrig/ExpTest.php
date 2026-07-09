@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ExpTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerEXP
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     */
-    public function testEXP($expectedResult, $number = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEXP')]
+    public function testEXP(mixed $expectedResult, mixed $number = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -33,15 +30,13 @@ class ExpTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/EXP.php';
     }
 
-    /**
-     * @dataProvider providerExpArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerExpArray')]
     public function testExpArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=EXP({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

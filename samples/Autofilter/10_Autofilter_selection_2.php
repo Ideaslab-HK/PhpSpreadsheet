@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule;
 
 require __DIR__ . '/../Header.php';
+/** @var PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 
 // Create new Spreadsheet object
 $helper->log('Create new Spreadsheet object');
@@ -25,11 +26,11 @@ $spreadsheet->getProperties()->setCreator('Maarten Balliauw')
 // Create the worksheet
 $helper->log('Add data');
 $spreadsheet->setActiveSheetIndex(0);
-$spreadsheet->getActiveSheet()->setCellValue('A1', 'Financial Year')
-    ->setCellValue('B1', 'Financial Period')
+$spreadsheet->getActiveSheet()->setCellValue('A1', 'Year')
+    ->setCellValue('B1', 'Period')
     ->setCellValue('C1', 'Country')
     ->setCellValue('D1', 'Date')
-    ->setCellValue('E1', 'Sales Value')
+    ->setCellValue('E1', 'Sales')
     ->setCellValue('F1', 'Expenditure');
 $dateTime = new DateTime();
 $startYear = $endYear = $currentYear = (int) $dateTime->format('Y');
@@ -126,7 +127,7 @@ $helper->log('Set country code filter (Column C) to "Germany"');
 $autoFilter->getColumn('D')
     ->setFilterType(Column::AUTOFILTER_FILTERTYPE_DYNAMICFILTER)
     ->createRule()
-    ->setRule(Rule::AUTOFILTER_COLUMN_RULE_EQUAL, null, Rule::AUTOFILTER_RULETYPE_DYNAMIC_YEARTODATE)
+    ->setRule(Rule::AUTOFILTER_COLUMN_RULE_EQUAL, '', Rule::AUTOFILTER_RULETYPE_DYNAMIC_YEARTODATE)
     ->setRuleType(Rule::AUTOFILTER_RULETYPE_DYNAMICFILTER);
 
 $helper->log('Add filter on the Date (Column D) to display year to date');

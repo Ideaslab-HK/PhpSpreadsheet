@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PriceDiscTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerPRICEDISC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testPRICEDISC($expectedResult, array $args): void
+    /** @param mixed[] $args */
+    #[DataProvider('providerPRICEDISC')]
+    public function testPRICEDISC(mixed $expectedResult, array $args): void
     {
         $this->runTestCase('PRICEDISC', $expectedResult, $args);
     }

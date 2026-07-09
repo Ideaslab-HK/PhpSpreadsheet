@@ -1,21 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SubstituteTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerSUBSTITUTE
-     *
-     * @param mixed $expectedResult
-     * @param mixed $text
-     * @param mixed $oldText
-     * @param mixed $newText
-     * @param mixed $instance
-     */
-    public function testSUBSTITUTE($expectedResult, $text = 'omitted', $oldText = 'omitted', $newText = 'omitted', $instance = 'omitted'): void
+    #[DataProvider('providerSUBSTITUTE')]
+    public function testSUBSTITUTE(mixed $expectedResult, mixed $text = 'omitted', mixed $oldText = 'omitted', mixed $newText = 'omitted', mixed $instance = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -49,16 +44,15 @@ class SubstituteTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/SUBSTITUTE.php';
     }
 
-    /**
-     * @dataProvider providerSubstituteArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerSubstituteArray')]
     public function testSubstituteArray(array $expectedResult, string $oldText, string $fromText, string $toText): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=SUBSTITUTE({$oldText}, {$fromText}, {$toText})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerSubstituteArray(): array

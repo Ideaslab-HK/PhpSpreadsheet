@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ConfidenceTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCONFIDENCE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCONFIDENCE($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCONFIDENCE')]
+    public function testCONFIDENCE(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCaseReference('CONFIDENCE', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class ConfidenceTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/CONFIDENCE.php';
     }
 
-    /**
-     * @dataProvider providerConfidenceArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfidenceArray')]
     public function testConfidenceArray(array $expectedResult, string $alpha, string $stdDev, string $size): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=CONFIDENCE({$alpha}, {$stdDev}, {$size})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

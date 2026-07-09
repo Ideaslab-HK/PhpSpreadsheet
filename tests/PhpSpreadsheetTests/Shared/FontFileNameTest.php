@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
+use PhpOffice\PhpSpreadsheet\Chart\ChartColor;
 use PhpOffice\PhpSpreadsheet\Exception as SSException;
 use PhpOffice\PhpSpreadsheet\Shared\Font;
 use PhpOffice\PhpSpreadsheet\Style\Font as StyleFont;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FontFileNameTest extends TestCase
 {
     private const DEFAULT_DIRECTORY = 'tests/data/Shared/FakeFonts/Default';
     private const MAC_DIRECTORY = 'tests/data/Shared/FakeFonts/Mac';
+    private const RECURSE_DIRECTORY = 'tests/data/Shared/FakeFonts/Recurse';
 
-    /** @var string */
-    private $holdDirectory;
+    private string $holdDirectory;
 
-    /** @var array */
-    private $holdExtraFontArray;
+    /** @var array<string, array<string, string>> */
+    private array $holdExtraFontArray;
 
     protected function setUp(): void
     {
@@ -39,8 +43,9 @@ class FontFileNameTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDefault
+     * @param array{name?: string, latin?: string, eastAsian?: string, complexScript?: string, bold?: bool, italic?: bool, superscript?: bool, subscript?: bool, underline?: bool|string, strikethrough?: bool, color?: string[], size?: ?int, chartColor?: ChartColor, scheme?: string, cap?: string} $fontArray Array containing style information
      */
+    #[DataProvider('providerDefault')]
     public function testDefaultFilenames(string $expected, array $fontArray): void
     {
         if ($expected === 'exception') {
@@ -81,8 +86,9 @@ class FontFileNameTest extends TestCase
     }
 
     /**
-     * @dataProvider providerMac
+     * @param array{name?: string, latin?: string, eastAsian?: string, complexScript?: string, bold?: bool, italic?: bool, superscript?: bool, subscript?: bool, underline?: bool|string, strikethrough?: bool, color?: string[], size?: ?int, chartColor?: ChartColor, scheme?: string, cap?: string} $fontArray Array containing style information
      */
+    #[DataProvider('providerMac')]
     public function testMacFilenames(string $expected, array $fontArray): void
     {
         if ($expected === 'exception') {
@@ -123,8 +129,9 @@ class FontFileNameTest extends TestCase
     }
 
     /**
-     * @dataProvider providerOverride
+     * @param array{name?: string, latin?: string, eastAsian?: string, complexScript?: string, bold?: bool, italic?: bool, superscript?: bool, subscript?: bool, underline?: bool|string, strikethrough?: bool, color?: string[], size?: ?int, chartColor?: ChartColor, scheme?: string, cap?: string} $fontArray Array containing style information
      */
+    #[DataProvider('providerOverride')]
     public function testOverrideFilenames(string $expected, array $fontArray): void
     {
         Font::setTrueTypeFontPath(self::DEFAULT_DIRECTORY);
@@ -153,8 +160,9 @@ class FontFileNameTest extends TestCase
     }
 
     /**
-     * @dataProvider providerOverrideAbsolute
+     * @param array{name?: string, latin?: string, eastAsian?: string, complexScript?: string, bold?: bool, italic?: bool, superscript?: bool, subscript?: bool, underline?: bool|string, strikethrough?: bool, color?: string[], size?: ?int, chartColor?: ChartColor, scheme?: string, cap?: string} $fontArray Array containing style information
      */
+    #[DataProvider('providerOverrideAbsolute')]
     public function testOverrideFilenamesAbsolute(string $expected, array $fontArray): void
     {
         $realPath = realpath(self::MAC_DIRECTORY) . DIRECTORY_SEPARATOR;
@@ -180,6 +188,32 @@ class FontFileNameTest extends TestCase
             'absolute path italic' => ['Arial Italic.ttf', ['name' => 'Arial', 'italic' => true]],
             'absolute path bold italic' => ['Arial Bold Italic.ttf', ['name' => 'Arial', 'bold' => true, 'italic' => true]],
             'non-absolute path uses TrueTypeFontPath' => ['cour.ttf', ['name' => 'Courier New']],
+        ];
+    }
+
+    /**
+     * @param array{name?: string, latin?: string, eastAsian?: string, complexScript?: string, bold?: bool, italic?: bool, superscript?: bool, subscript?: bool, underline?: bool|string, strikethrough?: bool, color?: string[], size?: ?int, chartColor?: ChartColor, scheme?: string, cap?: string} $fontArray Array containing style information
+     */
+    #[DataProvider('providerRecurse')]
+    public function testRecurseFilenames(string $expected, array $fontArray): void
+    {
+        if ($expected === 'exception') {
+            $this->expectException(SSException::class);
+            $this->expectExceptionMessage('TrueType Font file not found');
+        }
+        Font::setTrueTypeFontPath(self::RECURSE_DIRECTORY);
+        $font = (new StyleFont())->applyFromArray($fontArray);
+        $result = Font::getTrueTypeFontFileFromFont($font);
+        self::assertSame($expected, basename($result));
+    }
+
+    public static function providerRecurse(): array
+    {
+        return [
+            'in subdirectory' => ['arial.ttf', ['name' => 'Arial']],
+            'in subdirectory bold' => ['arialbd.ttf', ['name' => 'Arial', 'bold' => true]],
+            'in main directory' => ['cour.ttf', ['name' => 'Courier New']],
+            'not in main or subdirectory' => ['exception', ['name' => 'Courier New', 'bold' => true]],
         ];
     }
 }

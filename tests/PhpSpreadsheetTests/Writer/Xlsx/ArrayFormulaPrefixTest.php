@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Writer\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -9,11 +11,6 @@ use PhpOffice\PhpSpreadsheetTests\Functional\AbstractFunctional;
 
 class ArrayFormulaPrefixTest extends AbstractFunctional
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * Test to ensure that xlfn prefix is being added to functions
      * included in an array formula, if appropriate.
@@ -36,6 +33,7 @@ class ArrayFormulaPrefixTest extends AbstractFunctional
         //Write formula
         $cell = $worksheet->getCell('A7');
         $cell->setValueExplicit('=TEXTJOIN("",TRUE,IF(ISNUMBER(A1:A6), A1:A6,""))', DataType::TYPE_FORMULA);
+        /** @var array<string, string> */
         $attrs = $cell->getFormulaAttributes();
         $attrs['t'] = 'array';
         $cell->setFormulaAttributes($attrs);
@@ -72,6 +70,7 @@ class ArrayFormulaPrefixTest extends AbstractFunctional
         //Write formula
         $cell = $worksheet->getCell('A7');
         $cell->setValueExplicit('=SUM(LEN(A1:A6))', DataType::TYPE_FORMULA);
+        /** @var array<string, string> */
         $attrs = $cell->getFormulaAttributes();
         $attrs['t'] = 'array';
         $cell->setFormulaAttributes($attrs);

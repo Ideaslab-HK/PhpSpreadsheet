@@ -1,19 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MatchTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMATCH
-     *
-     * @param mixed $expectedResult
-     * @param mixed $input
-     * @param mixed $type
-     */
-    public function testMATCH($expectedResult, $input, array $array, $type = null): void
+    /** @param mixed[] $array */
+    #[DataProvider('providerMATCH')]
+    public function testMATCH(mixed $expectedResult, mixed $input, array $array, null|float|int|string $type = null): void
     {
         if (is_array($expectedResult)) {
             $expectedResult = $expectedResult[0];
@@ -41,14 +39,9 @@ class MatchTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerMATCH
-     *
-     * @param mixed $expectedResult
-     * @param mixed $input
-     * @param mixed $type
-     */
-    public function testMATCHLibre($expectedResult, $input, array $array, $type = null): void
+    /** @param mixed[] $array */
+    #[DataProvider('providerMATCH')]
+    public function testMATCHLibre(mixed $expectedResult, mixed $input, array $array, null|float|int|string $type = null): void
     {
         $this->setOpenOffice();
         if (is_array($expectedResult)) {
@@ -74,7 +67,7 @@ class MatchTest extends AllSetupTeardown
         $sheet->getCell('D1')->setValue($formula);
 
         $result = $sheet->getCell('D1')->getCalculatedValue();
-        self::assertEquals($expectedResult, $result);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerMATCH(): array
@@ -82,16 +75,14 @@ class MatchTest extends AllSetupTeardown
         return require 'tests/data/Calculation/LookupRef/MATCH.php';
     }
 
-    /**
-     * @dataProvider providerMatchArray
-     */
+    #[DataProvider('providerMatchArray')]
     public function testMatchArray(array $expectedResult, string $values, string $selections): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MATCH({$values}, {$selections}, 0)";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerMatchArray(): array

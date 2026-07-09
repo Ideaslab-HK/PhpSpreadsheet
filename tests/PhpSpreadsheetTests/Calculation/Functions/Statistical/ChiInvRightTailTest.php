@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ChiInvRightTailTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCHIINV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCHIINV($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCHIINV')]
+    public function testCHIINV(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('CHISQ.INV.RT', $expectedResult, ...$args);
     }
@@ -28,22 +26,21 @@ class ChiInvRightTailTest extends AllSetupTeardown
         $degrees = 7;
         $calculation = Calculation::getInstance();
         $formula = "=CHISQ.INV.RT($probability, $degrees)";
-        $result = $calculation->_calculateFormulaValue($formula);
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-8);
         $formula = "=CHISQ.DIST.RT($result, $degrees)";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($probability, $result, 1.0e-8);
     }
 
-    /**
-     * @dataProvider providerChiInvRightTailArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerChiInvRightTailArray')]
     public function testChiInvRightTailArray(array $expectedResult, string $probabilities, string $degrees): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=CHISQ.INV.RT({$probabilities}, {$degrees})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

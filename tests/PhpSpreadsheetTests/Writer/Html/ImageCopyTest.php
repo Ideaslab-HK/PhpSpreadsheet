@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Writer\Html;
 
 use PhpOffice\PhpSpreadsheet\Reader\Xls as XlsReader;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 use PhpOffice\PhpSpreadsheet\Shared\File;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as XlsxWriter;
 use PhpOffice\PhpSpreadsheetTests\Functional;
 
 class ImageCopyTest extends Functional\AbstractFunctional
 {
-    /** @var string */
-    private $xlsxFile = '';
+    private string $xlsxFile = '';
 
     protected function tearDown(): void
     {
@@ -66,5 +68,17 @@ class ImageCopyTest extends Functional\AbstractFunctional
 
         $this->writeAndReload($reloadedSpreadsheet, 'Html');
         $reloadedSpreadsheet->disconnectWorksheets();
+    }
+
+    public function testSimulateFailedClose(): void
+    {
+        $this->expectException(WriterException::class);
+        $this->expectExceptionMessage('Could not close file ');
+        $file = 'samples/templates/27template.xls';
+        $reader = new XlsReader();
+        $spreadsheet = $reader->load($file);
+        $this->xlsxFile = File::temporaryFilename();
+        $writer = new HtmlExtend2($spreadsheet);
+        $writer->save($this->xlsxFile);
     }
 }

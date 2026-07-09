@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 
 //  Date String, Result
@@ -91,4 +93,5 @@ return [
     [36751, '0-08-13'],
     [ExcelError::VALUE(), false],
     [ExcelError::VALUE(), true],
+    'do not try to parse if no digits' => [ExcelError::VALUE(), 'x'],
 ];

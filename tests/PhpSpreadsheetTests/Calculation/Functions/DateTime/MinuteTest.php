@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -7,44 +9,32 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\TimeParts;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MinuteTest extends TestCase
 {
-    /**
-     * @dataProvider providerMINUTE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToMINUTE($expectedResult, ...$args): void
+    #[DataProvider('providerMINUTE')]
+    public function testDirectCallToMINUTE(mixed $expectedResult, mixed ...$args): void
     {
-        /** @scrutinizer ignore-call */
         $result = TimeParts::MINUTE(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerMINUTE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMINUTEAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerMINUTE')]
+    public function testMINUTEAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=MINUTE({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerMINUTE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMINUTEInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerMINUTE')]
+    public function testMINUTEInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -66,10 +56,8 @@ class MinuteTest extends TestCase
         return require 'tests/data/Calculation/DateTime/MINUTE.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyMINUTE
-     */
-    public function testMINUTEUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyMINUTE')]
+    public function testMINUTEUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -94,15 +82,14 @@ class MinuteTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerMinuteArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerMinuteArray')]
     public function testMinuteArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MINUTE({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

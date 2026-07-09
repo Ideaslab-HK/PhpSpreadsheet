@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Writer\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Shared\File;
@@ -51,6 +53,7 @@ class ConditionalFillTest extends TestCase
 
         $outfile = File::temporaryFilename();
         $writer = new XlsxWriter($spreadsheet);
+        $writer->setUseDiskCaching(true, sys_get_temp_dir());
         $writer->save($outfile);
         $spreadsheet->disconnectWorksheets();
 

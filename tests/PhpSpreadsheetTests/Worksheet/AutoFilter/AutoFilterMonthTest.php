@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet\AutoFilter;
 
 use DateTimeImmutable;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AutoFilterMonthTest extends SetupTeardown
 {
@@ -50,9 +53,8 @@ class AutoFilterMonthTest extends SetupTeardown
         $this->maxRow = 9;
     }
 
-    /**
-     * @dataProvider providerMonth
-     */
+    /** @param mixed[] $expectedVisible */
+    #[DataProvider('providerMonth')]
     public function testMonths(array $expectedVisible, string $rule): void
     {
         // Loop to avoid rare edge case where first calculation

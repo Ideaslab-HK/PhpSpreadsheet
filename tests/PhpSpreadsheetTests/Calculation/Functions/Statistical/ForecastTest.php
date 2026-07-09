@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -10,12 +12,8 @@ use PHPUnit\Framework\TestCase;
 // Note that null in reference is treated differently than null in array.
 class ForecastTest extends TestCase
 {
-    /**
-     * @dataProvider providerFORECAST
-     *
-     * @param mixed $expectedResult
-     */
-    public function testFORECAST($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFORECAST')]
+    public function testFORECAST(mixed $expectedResult, mixed ...$args): void
     {
         $result = Statistical\Trends::FORECAST(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
@@ -26,15 +24,13 @@ class ForecastTest extends TestCase
         return require 'tests/data/Calculation/Statistical/FORECAST.php';
     }
 
-    /**
-     * @dataProvider providerForecastArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForecastArray')]
     public function testForecastArray(array $expectedResult, string $testValues, string $yValues, string $xValues): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=FORECAST({$testValues}, {$yValues}, {$xValues})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

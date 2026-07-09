@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\ConditionalFormatting\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -10,20 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 class DateValueWizardTest extends TestCase
 {
-    /**
-     * @var Style
-     */
-    protected $style;
+    protected Style $style;
 
-    /**
-     * @var string
-     */
-    protected $range = '$C$3:$E$5';
+    protected string $range = '$C$3:$E$5';
 
-    /**
-     * @var Wizard
-     */
-    protected $wizardFactory;
+    protected Wizard $wizardFactory;
 
     protected function setUp(): void
     {
@@ -31,9 +24,7 @@ class DateValueWizardTest extends TestCase
         $this->style = new Style();
     }
 
-    /**
-     * @dataProvider dateValueWizardProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateValueWizardProvider')]
     public function testDateValueWizard(string $operator, string $expectedReference, string $expectedExpression): void
     {
         $ruleType = Wizard::DATES_OCCURRING;
@@ -45,7 +36,7 @@ class DateValueWizardTest extends TestCase
 
         $conditional = $dateWizard->getConditional();
         self::assertSame(Conditional::CONDITION_TIMEPERIOD, $conditional->getConditionType());
-        self:self::assertSame($expectedReference, $conditional->getText());
+        self::assertSame($expectedReference, $conditional->getText());
         $conditions = $conditional->getConditions();
         self::assertSame([$expectedExpression], $conditions);
 
@@ -73,5 +64,18 @@ class DateValueWizardTest extends TestCase
         $conditional = new Conditional();
         $conditional->setConditionType($ruleType);
         Wizard\DateValue::fromConditional($conditional);
+    }
+
+    protected string $unknown = 'UNKNOWN';
+
+    public function testInvalidOperator(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid Operation for Date Value CF Rule Wizard');
+        $ruleType = Wizard::DATES_OCCURRING;
+        /** @var Wizard\DateValue $wizard */
+        $wizard = $this->wizardFactory->newRule($ruleType);
+        $ruleType = $this->unknown;
+        $wizard->$ruleType();
     }
 }

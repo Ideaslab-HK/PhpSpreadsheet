@@ -1,18 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LenTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerLEN
-     *
-     * @param mixed $expectedResult
-     * @param mixed $str
-     */
-    public function testLEN($expectedResult, $str = 'omitted'): void
+    #[DataProvider('providerLEN')]
+    public function testLEN(mixed $expectedResult, mixed $str = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -31,16 +29,15 @@ class LenTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/LEN.php';
     }
 
-    /**
-     * @dataProvider providerLenArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerLenArray')]
     public function testLenArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=LEN({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerLenArray(): array

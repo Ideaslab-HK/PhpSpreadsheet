@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -11,6 +13,7 @@ class AutoFilter2Test extends TestCase
 {
     private const TESTBOOK = 'tests/data/Reader/XLSX/autofilter2.xlsx';
 
+    /** @return int[] */
     public function getVisibleSheet(?Worksheet $sheet, int $maxRow): array
     {
         $actualVisible = [];
@@ -36,14 +39,13 @@ class AutoFilter2Test extends TestCase
         self::assertCount(1, $columns);
         $column = $columns['A'] ?? null;
         self::assertNotNull($column);
-        /** @scrutinizer ignore-call */
         $ruleset = $column->getRules();
         self::assertCount(1, $ruleset);
         $rule = $ruleset[0];
         self::assertSame(Rule::AUTOFILTER_RULETYPE_DATEGROUP, $rule->getRuleType());
         $value = $rule->getValue();
         self::assertIsArray($value);
-        self::assertCount(6, /** @scrutinizer ignore-type */ $value);
+        self::assertCount(6, $value);
         self::assertSame('2002', $value['year']);
         self::assertSame('', $value['month']);
         self::assertSame('', $value['day']);
@@ -68,7 +70,6 @@ class AutoFilter2Test extends TestCase
         self::assertCount(1, $columns);
         $column = $columns['A'] ?? null;
         self::assertNotNull($column);
-        /** @scrutinizer ignore-call */
         $ruleset = $column->getRules();
         self::assertCount(1, $ruleset);
         $rule = $ruleset[0];
@@ -93,7 +94,6 @@ class AutoFilter2Test extends TestCase
         self::assertCount(1, $columns);
         $column = $columns['A'] ?? null;
         self::assertNotNull($column);
-        /** @scrutinizer ignore-call */
         $ruleset = $column->getRules();
         self::assertCount(1, $ruleset);
         $rule = $ruleset[0];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx\AutoFilter;
@@ -13,10 +15,10 @@ class AutoFilterTest extends TestCase
     private function getXMLInstance(string $ref): SimpleXMLElement
     {
         return new SimpleXMLElement(
-            '<?xml version="1.0" encoding="UTF-8"?>' .
-            '<root>' .
-                '<autoFilter ref="' . $ref . '"></autoFilter>' .
-            '</root>'
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<root>'
+                . '<autoFilter ref="' . $ref . '"></autoFilter>'
+            . '</root>'
         );
     }
 
@@ -28,14 +30,8 @@ class AutoFilterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider loadDataProvider
-     *
-     * @param string $ref
-     * @param int $expectedReadAutoFilterCalled
-     * @param string $expectedRef
-     */
-    public function testLoad($ref, $expectedReadAutoFilterCalled, $expectedRef): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('loadDataProvider')]
+    public function testLoad(string $ref, int $expectedReadAutoFilterCalled, string $expectedRef): void
     {
         $worksheetAutoFilter = $this->getMockBuilder(WorksheetAutoFilter::class)
             ->disableOriginalConstructor()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style;
 
 use PhpOffice\PhpSpreadsheet\Style\Color;
@@ -74,12 +76,8 @@ class ColorTest extends TestCase
         self::assertEquals('FF123456', $color->getARGB());
     }
 
-    /**
-     * @dataProvider providerColorGetRed
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGetRed($expectedResult, string $color, ?bool $bool = null): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColorGetRed')]
+    public function testGetRed(mixed $expectedResult, string $color, ?bool $bool = null): void
     {
         if ($bool === null) {
             $result = Color::getRed($color);
@@ -94,12 +92,8 @@ class ColorTest extends TestCase
         return require 'tests/data/Style/Color/ColorGetRed.php';
     }
 
-    /**
-     * @dataProvider providerColorGetGreen
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGetGreen($expectedResult, string $color, ?bool $bool = null): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColorGetGreen')]
+    public function testGetGreen(mixed $expectedResult, string $color, ?bool $bool = null): void
     {
         if ($bool === null) {
             $result = Color::getGreen($color);
@@ -114,12 +108,8 @@ class ColorTest extends TestCase
         return require 'tests/data/Style/Color/ColorGetGreen.php';
     }
 
-    /**
-     * @dataProvider providerColorGetBlue
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGetBlue($expectedResult, string $color, ?bool $bool = null): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColorGetBlue')]
+    public function testGetBlue(mixed $expectedResult, string $color, ?bool $bool = null): void
     {
         if ($bool === null) {
             $result = Color::getBlue($color);
@@ -134,14 +124,10 @@ class ColorTest extends TestCase
         return require 'tests/data/Style/Color/ColorGetBlue.php';
     }
 
-    /**
-     * @dataProvider providerColorChangeBrightness
-     *
-     * @param mixed $expectedResult
-     */
-    public function testChangeBrightness($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColorChangeBrightness')]
+    public function testChangeBrightness(string $expectedResult, string $hexColorValue, float $adjustPercentages): void
     {
-        $result = Color::changeBrightness(...$args);
+        $result = Color::changeBrightness($hexColorValue, $adjustPercentages);
         self::assertEquals($expectedResult, $result);
     }
 

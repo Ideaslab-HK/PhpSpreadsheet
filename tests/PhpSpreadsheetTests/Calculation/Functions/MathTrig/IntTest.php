@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class IntTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerINT
-     *
-     * @param mixed $expectedResult
-     * @param string $formula
-     */
-    public function testINT($expectedResult, $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerINT')]
+    public function testINT(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -30,15 +27,13 @@ class IntTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/INT.php';
     }
 
-    /**
-     * @dataProvider providerIntArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIntArray')]
     public function testIntArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=INT({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

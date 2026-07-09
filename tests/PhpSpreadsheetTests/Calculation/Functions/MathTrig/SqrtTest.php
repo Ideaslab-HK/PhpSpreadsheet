@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class SqrtTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerSQRT
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     */
-    public function testSQRT($expectedResult, $number = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSQRT')]
+    public function testSQRT(mixed $expectedResult, mixed $number = 'omitted'): void
     {
         $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
@@ -31,15 +28,13 @@ class SqrtTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/SQRT.php';
     }
 
-    /**
-     * @dataProvider providerSqrtArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSqrtArray')]
     public function testSqrtArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=SQRT({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

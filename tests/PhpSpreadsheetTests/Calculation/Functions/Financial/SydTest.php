@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SydTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerSYD
-     *
-     * @param mixed $expectedResult
-     */
-    public function testSYD($expectedResult, array $args): void
+    /** @param mixed[] $args */
+    #[DataProvider('providerSYD')]
+    public function testSYD(mixed $expectedResult, array $args): void
     {
         $this->runTestCase('SYD', $expectedResult, $args);
     }

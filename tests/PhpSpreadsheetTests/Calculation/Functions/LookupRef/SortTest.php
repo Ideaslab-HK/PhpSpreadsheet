@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Sort;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SortTest extends TestCase
@@ -13,16 +16,11 @@ class SortTest extends TestCase
         $value = 'NON-ARRAY';
 
         $result = Sort::sort($value, 1, -1);
-        self::assertSame($value, $result);
+        self::assertSame([[$value]], $result);
     }
 
-    /**
-     * @dataProvider providerSortWithScalarArgumentErrorReturns
-     *
-     * @param mixed $sortIndex
-     * @param mixed$sortOrder
-     */
-    public function testSortWithScalarArgumentErrorReturns($sortIndex, $sortOrder = 1): void
+    #[DataProvider('providerSortWithScalarArgumentErrorReturns')]
+    public function testSortWithScalarArgumentErrorReturns(mixed $sortIndex, mixed $sortOrder = 1): void
     {
         $value = [[1, 2], [3, 4], [5, 6]];
 
@@ -49,15 +47,15 @@ class SortTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerSortByRow
-     */
+    /** @param mixed[] $matrix */
+    #[DataProvider('providerSortByRow')]
     public function testSortByRow(array $expectedResult, array $matrix, int $sortIndex, int $sortOrder = Sort::ORDER_ASCENDING): void
     {
         $result = Sort::sort($matrix, $sortIndex, $sortOrder);
         self::assertSame($expectedResult, $result);
     }
 
+    /** @return mixed[] */
     public static function providerSortByRow(): array
     {
         return [
@@ -81,8 +79,10 @@ class SortTest extends TestCase
     }
 
     /**
-     * @dataProvider providerSortByRowMultiLevel
+     * @param mixed[] $matrix
+     * @param mixed[] $sortIndex
      */
+    #[DataProvider('providerSortByRowMultiLevel')]
     public function testSortByRowMultiLevel(array $expectedResult, array $matrix, array $sortIndex, int $sortOrder = Sort::ORDER_ASCENDING): void
     {
         $result = Sort::sort($matrix, $sortIndex, $sortOrder);
@@ -149,9 +149,8 @@ class SortTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerSortByColumn
-     */
+    /** @param mixed[] $matrix */
+    #[DataProvider('providerSortByColumn')]
     public function testSortByColumn(array $expectedResult, array $matrix, int $sortIndex, int $sortOrder): void
     {
         $result = Sort::sort($matrix, $sortIndex, $sortOrder, true);
@@ -176,6 +175,7 @@ class SortTest extends TestCase
         ];
     }
 
+    /** @return array<int[]> */
     public static function sampleDataForRow(): array
     {
         return [
@@ -183,6 +183,7 @@ class SortTest extends TestCase
         ];
     }
 
+    /** @return array<array{string, string, int}> */
     public static function sampleDataForMultiRow(): array
     {
         return [
@@ -201,6 +202,7 @@ class SortTest extends TestCase
         ];
     }
 
+    /** @return array<int[]> */
     public static function sampleDataForColumn(): array
     {
         return [

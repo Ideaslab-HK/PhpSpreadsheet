@@ -1,35 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Database;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Database\DStDevP;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DStDevPTest extends SetupTeardownDatabases
 {
     /**
-     * @dataProvider providerDStDevP
-     *
-     * @param mixed $expectedResult
-     * @param mixed $database
-     * @param mixed $field
-     * @param mixed $criteria
+     * @param mixed[] $database
+     * @param mixed[][] $criteria
      */
-    public function testDirectCallToDStDevP($expectedResult, $database, $field, $criteria): void
+    #[DataProvider('providerDStDevP')]
+    public function testDirectCallToDStDevP(float|int|string $expectedResult, array $database, ?string $field, array $criteria): void
     {
         $result = DStDevP::evaluate($database, $field, $criteria);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-12);
     }
 
     /**
-     * @dataProvider providerDStDevP
-     *
-     * @param mixed $expectedResult
-     * @param mixed $database
-     * @param mixed $field
-     * @param mixed $criteria
+     * @param mixed[] $database
+     * @param mixed[][] $criteria
      */
-    public function testDStDevPAsWorksheetFormula($expectedResult, $database, $field, $criteria): void
+    #[DataProvider('providerDStDevP')]
+    public function testDStDevPAsWorksheetFormula(float|int|string $expectedResult, array $database, ?string $field, array $criteria): void
     {
         $this->prepareWorksheetWithFormula('DSTDEVP', $database, $field, $criteria);
 

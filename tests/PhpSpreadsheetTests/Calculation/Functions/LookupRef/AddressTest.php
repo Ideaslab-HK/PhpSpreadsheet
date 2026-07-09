@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class AddressTest extends TestCase
 {
-    /**
-     * @dataProvider providerADDRESS
-     *
-     * @param mixed $expectedResult
-     */
-    public function testADDRESS($expectedResult, ...$args): void
+    #[DataProvider('providerADDRESS')]
+    public function testADDRESS(mixed $expectedResult, mixed ...$args): void
     {
         $result = LookupRef\Address::cell(...$args);
         self::assertEquals($expectedResult, $result);
@@ -24,16 +23,14 @@ class AddressTest extends TestCase
         return require 'tests/data/Calculation/LookupRef/ADDRESS.php';
     }
 
-    /**
-     * @dataProvider providerAddressArray
-     */
+    #[DataProvider('providerAddressArray')]
     public function testAddressArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ADDRESS({$argument1}, {$argument2}, 4)";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerAddressArray(): array

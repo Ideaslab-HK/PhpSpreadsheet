@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
 
 class CoupDayBsTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCOUPDAYBS
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCOUPDAYBS($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCOUPDAYBS')]
+    public function testCOUPDAYBS(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCase('COUPDAYBS', $expectedResult, $args);
     }

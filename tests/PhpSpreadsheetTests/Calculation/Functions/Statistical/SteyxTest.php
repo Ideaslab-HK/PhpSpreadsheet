@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SteyxTest extends AllSetupTeardown
 {
     /**
-     * @dataProvider providerSTEYX
-     *
-     * @param mixed $expectedResult
+     * @param mixed[] $xargs
+     * @param mixed[] $yargs
      */
-    public function testSTEYX($expectedResult, array $xargs, array $yargs): void
+    #[DataProvider('providerSTEYX')]
+    public function testSTEYX(mixed $expectedResult, array $xargs, array $yargs): void
     {
         //$result = Statistical\Trends::STEYX($xargs, $yargs);
         //self::assertEqualsWithDelta($expectedResult, $result, 1E-12);

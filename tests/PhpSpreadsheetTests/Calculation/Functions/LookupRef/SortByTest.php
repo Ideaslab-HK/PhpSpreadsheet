@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Sort;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SortByTest extends TestCase
@@ -12,17 +15,12 @@ class SortByTest extends TestCase
     {
         $value = 'NON-ARRAY';
 
-        $result = Sort::sortBy($value);
-        self::assertSame($value, $result);
+        $result = Sort::sortBy($value, [[$value]]);
+        self::assertSame([[$value]], $result);
     }
 
-    /**
-     * @dataProvider providerSortWithScalarArgumentErrorReturns
-     *
-     * @param mixed $sortIndex
-     * @param mixed$sortOrder
-     */
-    public function testSortByWithArgumentErrorReturns($sortIndex, $sortOrder = 1): void
+    #[DataProvider('providerSortWithScalarArgumentErrorReturns')]
+    public function testSortByWithArgumentErrorReturns(mixed $sortIndex, mixed $sortOrder = 1): void
     {
         $value = [[1, 2], [3, 4], [5, 6]];
 
@@ -42,10 +40,9 @@ class SortByTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerSortByRow
-     */
-    public function testSortByRow(array $expectedResult, array $matrix, ...$args): void
+    /** @param mixed[] $matrix */
+    #[DataProvider('providerSortByRow')]
+    public function testSortByRow(array $expectedResult, array $matrix, mixed ...$args): void
     {
         $result = Sort::sortBy($matrix, ...$args);
         self::assertSame($expectedResult, $result);
@@ -146,6 +143,7 @@ class SortByTest extends TestCase
         ];
     }
 
+    /** @return array<array{string, int}> */
     private static function sampleDataForSimpleSort(): array
     {
         return [
@@ -160,6 +158,7 @@ class SortByTest extends TestCase
         ];
     }
 
+    /** @return array<array{string, string, int}> */
     private static function sampleDataForMultiSort(): array
     {
         return [

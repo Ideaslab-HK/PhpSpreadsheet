@@ -6,14 +6,14 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 
 require __DIR__ . '/../Header.php';
-
+/** @var \PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 $inputFileType = 'Xls';
 $inputFileName = __DIR__ . '/sampleData/example1.xls';
 $sheetname = 'Data Sheet #3';
 
 class MyReadFilter implements IReadFilter
 {
-    public function readCell($columnAddress, $row, $worksheetName = '')
+    public function readCell(string $columnAddress, int $row, string $worksheetName = ''): bool
     {
         // Read rows 9 to 15 and columns A to E only
         if ($row >= 9 && $row <= 15) {
@@ -28,7 +28,7 @@ class MyReadFilter implements IReadFilter
 
 $filterSubset = new MyReadFilter();
 
-$helper->log('Loading file ' . /** @scrutinizer ignore-type */ pathinfo($inputFileName, PATHINFO_BASENAME) . ' using IOFactory with a defined reader type of ' . $inputFileType);
+$helper->log('Loading file ' . pathinfo($inputFileName, PATHINFO_BASENAME) . ' using IOFactory with a defined reader type of ' . $inputFileType);
 $helper->log('Filter range is A9:E15');
 $reader = IOFactory::createReader($inputFileType);
 $helper->log('Loading Sheet "' . $sheetname . '" only');

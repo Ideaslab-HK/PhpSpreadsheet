@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class EvenTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerEVEN
-     *
-     * @param mixed $expectedResult
-     * @param mixed $value
-     */
-    public function testEVEN($expectedResult, $value): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEVEN')]
+    public function testEVEN(int|string $expectedResult, float|int|string $value): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +23,13 @@ class EvenTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/EVEN.php';
     }
 
-    /**
-     * @dataProvider providerEvenArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEvenArray')]
     public function testEvenArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=EVEN({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

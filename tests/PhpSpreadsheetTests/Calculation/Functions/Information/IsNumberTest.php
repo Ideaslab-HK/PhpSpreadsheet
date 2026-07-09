@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Information;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\Value;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IsNumberTest extends TestCase
@@ -14,12 +17,8 @@ class IsNumberTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @dataProvider providerIsNumber
-     *
-     * @param mixed $value
-     */
-    public function testIsNumber(bool $expectedResult, $value): void
+    #[DataProvider('providerIsNumber')]
+    public function testIsNumber(bool $expectedResult, mixed $value): void
     {
         $result = Value::isNumber($value);
         self::assertEquals($expectedResult, $result);
@@ -30,16 +29,14 @@ class IsNumberTest extends TestCase
         return require 'tests/data/Calculation/Information/IS_NUMBER.php';
     }
 
-    /**
-     * @dataProvider providerIsNumberArray
-     */
+    #[DataProvider('providerIsNumberArray')]
     public function testIsNumberArray(array $expectedResult, string $values): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ISNUMBER({$values})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerIsNumberArray(): array

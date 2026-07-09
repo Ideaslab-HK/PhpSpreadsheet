@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 require __DIR__ . '/../Header.php';
+/** @var PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 
 // Create new Spreadsheet object
 $helper->log('Create new Spreadsheet object');
@@ -109,9 +110,9 @@ $richText = new RichText();
 $richText->createText('你好 ');
 
 $payable = $richText->createTextRun('你 好 吗？');
-$payable->getFont()->setBold(true);
-$payable->getFont()->setItalic(true);
-$payable->getFont()->setColor(new Color(Color::COLOR_DARKGREEN));
+$payable->getFontOrThrow()->setBold(true);
+$payable->getFontOrThrow()->setItalic(true);
+$payable->getFontOrThrow()->setColor(new Color(Color::COLOR_DARKGREEN));
 
 $richText->createText(', unless specified otherwise on the invoice.');
 
@@ -123,7 +124,7 @@ $richText2 = new RichText();
 $richText2->createText("black text\n");
 
 $red = $richText2->createTextRun('red text');
-$red->getFont()->setColor(new Color(Color::COLOR_RED));
+$red->getFontOrThrow()->setColor(new Color(Color::COLOR_RED));
 
 $spreadsheet->getActiveSheet()
     ->getCell('C14')
@@ -141,9 +142,11 @@ $spreadsheet->getActiveSheet()
     ->getHyperlink()
     ->setUrl('https://github.com/PHPOffice/PhpSpreadsheet')
     ->setTooltip('Navigate to PhpSpreadsheet website');
+$spreadsheet->getActiveSheet()->getStyle('C17')->getFont()->setHyperlinkTheme();
 
 $spreadsheet->getActiveSheet()
     ->setCellValue('C18', '=HYPERLINK("mailto:abc@def.com","abc@def.com")');
+$spreadsheet->getActiveSheet()->getStyle('C18')->getFont()->setHyperlinkTheme();
 
 $spreadsheet->getActiveSheet()
     ->setCellValue('A20', 'String')

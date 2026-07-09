@@ -1,19 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ReptTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerREPT
-     *
-     * @param mixed $expectedResult
-     * @param mixed $val
-     * @param mixed $rpt
-     */
-    public function testReptThroughEngine($expectedResult, $val = 'omitted', $rpt = 'omitted'): void
+    #[DataProvider('providerREPT')]
+    public function testReptThroughEngine(mixed $expectedResult, mixed $val = 'omitted', mixed $rpt = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -36,16 +33,15 @@ class ReptTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/REPT.php';
     }
 
-    /**
-     * @dataProvider providerReptArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerReptArray')]
     public function testReptArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=REPT({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerReptArray(): array

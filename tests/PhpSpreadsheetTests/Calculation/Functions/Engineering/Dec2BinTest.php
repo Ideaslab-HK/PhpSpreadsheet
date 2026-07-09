@@ -1,76 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ConvertDecimal;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class Dec2BinTest extends TestCase
+class Dec2BinTest extends AllSetupTeardown
 {
-    /**
-     * @var string
-     */
-    private $compatibilityMode;
-
-    protected function setUp(): void
+    #[DataProvider('providerDEC2BIN')]
+    public function testDirectCallToDEC2BIN(mixed $expectedResult, bool|float|int|string $value, null|float|int|string $digits = null): void
     {
-        $this->compatibilityMode = Functions::getCompatibilityMode();
-    }
-
-    protected function tearDown(): void
-    {
-        Functions::setCompatibilityMode($this->compatibilityMode);
-    }
-
-    /**
-     * @dataProvider providerDEC2BIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToDEC2BIN($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
-        $result = ConvertDecimal::toBinary(...$args);
+        $result = ($digits === null) ? ConvertDecimal::toBinary($value) : ConvertDecimal::toBinary($value, $digits);
         self::assertSame($expectedResult, $result);
     }
 
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerDEC2BIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDEC2BINAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerDEC2BIN')]
+    public function testDEC2BINAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=DEC2BIN({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame($expectedResult, $this->trimIfQuoted((string) $result));
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerDEC2BIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDEC2BINInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerDEC2BIN')]
+    public function testDEC2BINInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
-        $spreadsheet = new Spreadsheet();
-        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $this->getSheet();
         $argumentCells = $arguments->populateWorksheet($worksheet);
         $formula = "=DEC2BIN({$argumentCells})";
 
@@ -78,8 +44,6 @@ class Dec2BinTest extends TestCase
             ->getCell('A1')
             ->getCalculatedValue();
         self::assertSame($expectedResult, $result);
-
-        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerDEC2BIN(): array
@@ -87,15 +51,12 @@ class Dec2BinTest extends TestCase
         return require 'tests/data/Calculation/Engineering/DEC2BIN.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyDEC2BIN
-     */
-    public function testDEC2BINUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyDEC2BIN')]
+    public function testDEC2BINUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
-        $spreadsheet = new Spreadsheet();
-        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $this->getSheet();
         $argumentCells = $arguments->populateWorksheet($worksheet);
         $formula = "=DEC2BIN({$argumentCells})";
 
@@ -104,8 +65,6 @@ class Dec2BinTest extends TestCase
         $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-
-        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerUnhappyDEC2BIN(): array
@@ -115,17 +74,12 @@ class Dec2BinTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerDEC2BINOds
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDEC2BINOds($expectedResult, ...$args): void
+    #[DataProvider('providerDEC2BINOds')]
+    public function testDEC2BINOds(mixed $expectedResult, bool|float|int|string $value, null|float|int|string $digits = null): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
+        $this->setOpenOffice();
 
-        /** @scrutinizer ignore-call */
-        $result = ConvertDecimal::toBinary(...$args);
+        $result = ($digits === null) ? ConvertDecimal::toBinary($value) : ConvertDecimal::toBinary($value, $digits);
         self::assertSame($expectedResult, $result);
     }
 
@@ -139,28 +93,27 @@ class Dec2BinTest extends TestCase
         $calculation = Calculation::getInstance();
         $formula = '=DEC2BIN(5.1)';
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_GNUMERIC);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame('101', $this->trimIfQuoted((string) $result), 'Gnumeric');
+        $this->setGnumeric();
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame('101', $result, 'Gnumeric');
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame('101', $this->trimIfQuoted((string) $result), 'OpenOffice');
+        $this->setOpenOffice();
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame('101', $result, 'OpenOffice');
 
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertSame('101', $this->trimIfQuoted((string) $result), 'Excel');
+        $this->setExcel();
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame('101', $result, 'Excel');
     }
 
-    /**
-     * @dataProvider providerDec2BinArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerDec2BinArray')]
     public function testDec2BinArray(array $expectedResult, string $value): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=DEC2BIN({$value})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

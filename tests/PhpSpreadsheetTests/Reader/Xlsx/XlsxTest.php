@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\IReader;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Shared\File;
+use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Style\Conditional;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class XlsxTest extends TestCase
@@ -38,6 +43,7 @@ class XlsxTest extends TestCase
         }
 
         self::assertFalse($worksheet->getColumnDimension('E')->getVisible());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testLoadXlsxWithStyles(): void
@@ -55,13 +61,14 @@ class XlsxTest extends TestCase
 
         $worksheet = $spreadsheet->getActiveSheet();
         for ($row = 1; $row <= 8; $row += 2) {
-            for ($column = 'A'; $column !== 'G'; ++$column, ++$column) {
+            for ($column = 'A'; $column !== 'G'; StringHelper::stringIncrement($column), StringHelper::stringIncrement($column)) {
                 self::assertEquals(
                     $expectedColours[$row][$column],
                     $worksheet->getStyle($column . $row)->getFill()->getStartColor()->getRGB()
                 );
             }
         }
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
@@ -84,6 +91,7 @@ class XlsxTest extends TestCase
         $reloadedWorksheet = $reloadedSpreadsheet->getActiveSheet();
 
         self::assertEquals('TipoDato', $reloadedWorksheet->getCell('A1')->getValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
@@ -105,6 +113,7 @@ class XlsxTest extends TestCase
 
         $reloadedWorksheet = $reloadedSpreadsheet->getActiveSheet();
         self::assertEquals('TipoDato', $reloadedWorksheet->getCell('A1')->getValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testLoadXlsxAutofilter(): void
@@ -116,12 +125,12 @@ class XlsxTest extends TestCase
         $worksheet = $spreadsheet->getActiveSheet();
 
         $autofilter = $worksheet->getAutoFilter();
-        self::assertInstanceOf(AutoFilter::class, $autofilter);
         self::assertEquals('A1:D57', $autofilter->getRange());
         self::assertEquals(
             AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER,
             $autofilter->getColumn('A')->getFilterType()
         );
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testLoadXlsxPageSetup(): void
@@ -159,19 +168,22 @@ class XlsxTest extends TestCase
         self::assertEquals(Conditional::CONDITION_CELLIS, $conditionalRule->getConditionType());
         self::assertEquals(Conditional::OPERATOR_BETWEEN, $conditionalRule->getOperatorType());
         self::assertEquals(['200', '400'], $conditionalRule->getConditions());
-        self::assertInstanceOf(Style::class, $conditionalRule->getStyle());
+        /** @var mixed[][] */
+        $temp = $conditionalRule->getStyle()->exportArray();
+        self::assertSame('#,##0.00_-"€"', $temp['numberFormat']['formatCode']);
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
      * Test load Xlsx file without cell reference.
-     *
-     * @doesNotPerformAssertions
      */
     public function testLoadXlsxWithoutCellReference(): void
     {
         $filename = 'tests/data/Reader/XLSX/without_cell_reference.xlsx';
         $reader = new Xlsx();
-        $reader->load($filename);
+        $spreadsheet = $reader->load($filename);
+        self::assertSame(1, $spreadsheet->getActiveSheet()->getCell('A1')->getValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
@@ -182,24 +194,26 @@ class XlsxTest extends TestCase
         $filename = 'tests/data/Reader/XLSX/without_cell_reference.xlsx';
         $reader = new Xlsx();
         $reader->setReadFilter(new OddColumnReadFilter());
-        $data = $reader->load($filename)->getActiveSheet()->toArray();
-        $ref = [1.0, null, 3.0, null, 5.0, null, 7.0, null, 9.0, null];
+        $spreadsheet = $reader->load($filename);
+        $data = $spreadsheet->getActiveSheet()->toArray(formatData: false);
+        $ref = [1, null, 3, null, 5, null, 7, null, 9, null];
 
         for ($i = 0; $i < 10; ++$i) {
-            self::assertEquals($ref, \array_slice($data[$i], 0, 10, true));
+            self::assertSame($ref, \array_slice($data[$i], 0, 10, true));
         }
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
      * Test load Xlsx file with drawing having double attributes.
-     *
-     * @doesNotPerformAssertions
      */
     public function testLoadXlsxWithDoubleAttrDrawing(): void
     {
         $filename = 'tests/data/Reader/XLSX/double_attr_drawing.xlsx';
         $reader = new Xlsx();
-        $reader->load($filename);
+        $spreadsheet = $reader->load($filename);
+        self::assertSame('TOSHIBA_HITACHI_SKYWORTH', $spreadsheet->getActiveSheet()->getTitle());
+        $spreadsheet->disconnectWorksheets();
     }
 
     /**
@@ -216,16 +230,15 @@ class XlsxTest extends TestCase
         $writer->save($resultFilename);
         $excel = $reader->load($resultFilename);
         unlink($resultFilename);
-        // Fake assert. The only thing we need is to ensure the file is loaded without exception
-        self::assertNotNull($excel);
+        self::assertSame(1.0, $excel->getActiveSheet()->getCell('A1')->getValue());
+        $excel->disconnectWorksheets();
     }
 
     /**
      * Test if all whitespace is removed from a style definition string.
      * This is needed to parse it into properties with the correct keys.
-     *
-     * @dataProvider providerStripsWhiteSpaceFromStyleString
      */
+    #[DataProvider('providerStripsWhiteSpaceFromStyleString')]
     public function testStripsWhiteSpaceFromStyleString(string $string): void
     {
         $string = Xlsx::stripWhiteSpaceFromStyleString($string);
@@ -242,5 +255,32 @@ height:13.5pt;z-index:5;mso-wrap-style:tight'],
             ['position:absolute; margin-left:424.5pt; margin-top:169.5pt; width:67.5pt;
             height:13.5pt;z-index:5;mso-wrap-style:tight'],
         ];
+    }
+
+    public function testLoadDataOnlyLoadsAlsoTables(): void
+    {
+        $filename = 'tests/data/Reader/XLSX/data_with_tables.xlsx';
+        $reader = new Xlsx();
+        $excel = $reader->load($filename, IReader::READ_DATA_ONLY);
+
+        self::assertEquals(['First', 'Second'], $excel->getSheetNames());
+
+        $table = $excel->getTableByName('Tableau1');
+        $firstSheet = $excel->getSheetByName('First');
+        $secondSheet = $excel->getSheetByName('Second');
+        if (!$table || !$firstSheet || !$secondSheet) {
+            self::fail('Table or Sheet not found.');
+        }
+
+        self::assertEquals('A1:B5', $table->getRange());
+        self::assertEquals([['1', '2', '3']], $firstSheet->toArray());
+        self::assertEquals([
+            ['Colonne1', 'Colonne2'],
+            ['a', 'b'],
+            ['c', 'd'],
+            ['e', 'f'],
+            ['g', 'h'],
+        ], $secondSheet->toArray());
+        $excel->disconnectWorksheets();
     }
 }

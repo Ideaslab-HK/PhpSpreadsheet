@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\ConditionalFormatting;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -8,14 +10,12 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\CellMatcher;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CellMatcherTest extends TestCase
 {
-    /**
-     * @var ?Spreadsheet
-     */
-    protected $spreadsheet;
+    protected ?Spreadsheet $spreadsheet = null;
 
     protected function loadSpreadsheet(): Spreadsheet
     {
@@ -43,9 +43,8 @@ class CellMatcherTest extends TestCase
         return $cfRange;
     }
 
-    /**
-     * @dataProvider basicCellIsComparisonDataProvider
-     */
+    /** @param mixed[] $expectedMatches */
+    #[DataProvider('basicCellIsComparisonDataProvider')]
     public function testBasicCellIsComparison(string $sheetname, string $cellAddress, array $expectedMatches): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -113,9 +112,7 @@ class CellMatcherTest extends TestCase
         $this->spreadsheet->getSheetByNameOrThrow($sheetname);
     }
 
-    /**
-     * @dataProvider rangeCellIsComparisonDataProvider
-     */
+    #[DataProvider('rangeCellIsComparisonDataProvider')]
     public function testRangeCellIsComparison(string $sheetname, string $cellAddress, bool $expectedMatch): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -154,9 +151,8 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellIsExpressionMultipleDataProvider
-     */
+    /** @param mixed[] $expectedMatches */
+    #[DataProvider('cellIsExpressionMultipleDataProvider')]
     public function testCellIsMultipleExpression(string $sheetname, string $cellAddress, array $expectedMatches): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -188,9 +184,7 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellIsExpressionDataProvider
-     */
+    #[DataProvider('cellIsExpressionDataProvider')]
     public function testCellIsExpression(string $sheetname, string $cellAddress, bool $expectedMatch): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -232,9 +226,7 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider textExpressionsDataProvider
-     */
+    #[DataProvider('textExpressionsDataProvider')]
     public function testTextExpressions(string $sheetname, string $cellAddress, bool $expectedMatch): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -340,9 +332,8 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider blanksDataProvider
-     */
+    /** @param mixed[] $expectedMatches */
+    #[DataProvider('blanksDataProvider')]
     public function testBlankExpressions(string $sheetname, string $cellAddress, array $expectedMatches): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -371,9 +362,8 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider errorDataProvider
-     */
+    /** @param mixed[] $expectedMatches */
+    #[DataProvider('errorDataProvider')]
     public function testErrorExpressions(string $sheetname, string $cellAddress, array $expectedMatches): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -401,9 +391,7 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dateOccurringDataProvider
-     */
+    #[DataProvider('dateOccurringDataProvider')]
     public function testDateOccurringExpressions(string $sheetname, string $cellAddress, bool $expectedMatch): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -443,9 +431,8 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider duplicatesDataProvider
-     */
+    /** @param mixed[] $expectedMatches */
+    #[DataProvider('duplicatesDataProvider')]
     public function testDuplicatesExpressions(string $sheetname, string $cellAddress, array $expectedMatches): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();
@@ -477,9 +464,7 @@ class CellMatcherTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider textCrossWorksheetDataProvider
-     */
+    #[DataProvider('textCrossWorksheetDataProvider')]
     public function testCrossWorksheetExpressions(string $sheetname, string $cellAddress, bool $expectedMatch): void
     {
         $this->spreadsheet = $this->loadSpreadsheet();

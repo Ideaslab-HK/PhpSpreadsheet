@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Statistical;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 // TODO Convert to Spreadsheet context.
 class ChiTestTest extends TestCase
 {
     /**
-     * @dataProvider providerCHITEST
-     *
-     * @param mixed $expectedResult
-     * @param mixed $actual
-     * @param mixed $expected
+     * @param float[] $actual
+     * @param float[] $expected
      */
-    public function testCHITEST($expectedResult, $actual, $expected): void
+    #[DataProvider('providerCHITEST')]
+    public function testCHITEST(mixed $expectedResult, array $actual, array $expected): void
     {
         $result = Statistical\Distributions\ChiSquared::test($actual, $expected);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);

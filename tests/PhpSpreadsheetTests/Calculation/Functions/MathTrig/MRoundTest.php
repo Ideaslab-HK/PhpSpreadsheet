@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class MRoundTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMROUND
-     *
-     * @param mixed $expectedResult
-     * @param mixed $formula
-     */
-    public function testMROUND($expectedResult, $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMROUND')]
+    public function testMROUND(float|int|string $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -30,15 +27,13 @@ class MRoundTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/MROUND.php';
     }
 
-    /**
-     * @dataProvider providerMRoundArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMRoundArray')]
     public function testMRoundArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MROUND({$argument1},{$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

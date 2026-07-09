@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -7,43 +9,32 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\YearFrac;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class YearFracTest extends TestCase
 {
-    /**
-     * @dataProvider providerYEARFRAC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToYEARFRAC($expectedResult, ...$args): void
+    #[DataProvider('providerYEARFRAC')]
+    public function testDirectCallToYEARFRAC(mixed $expectedResult, mixed ...$args): void
     {
         $result = YearFrac::fraction(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-6);
     }
 
-    /**
-     * @dataProvider providerYEARFRAC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testYEARFRACAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerYEARFRAC')]
+    public function testYEARFRACAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=YEARFRAC({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-6);
     }
 
-    /**
-     * @dataProvider providerYEARFRAC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testYEARFRACInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerYEARFRAC')]
+    public function testYEARFRACInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -65,10 +56,8 @@ class YearFracTest extends TestCase
         return require 'tests/data/Calculation/DateTime/YEARFRAC.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyYEARFRAC
-     */
-    public function testYEARFRACUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyYEARFRAC')]
+    public function testYEARFRACUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -94,9 +83,8 @@ class YearFracTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerYearFracArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerYearFracArray')]
     public function testYearFracArray(array $expectedResult, string $startDate, string $endDate, ?string $methods): void
     {
         $calculation = Calculation::getInstance();
@@ -106,7 +94,7 @@ class YearFracTest extends TestCase
         } else {
             $formula = "=YEARFRAC({$startDate}, {$endDate}, {$methods})";
         }
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

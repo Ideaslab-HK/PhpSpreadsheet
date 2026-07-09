@@ -1,19 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DollarTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerDOLLAR
-     *
-     * @param mixed $expectedResult
-     * @param mixed $amount
-     * @param mixed $decimals
-     */
-    public function testDOLLAR($expectedResult, $amount = 'omitted', $decimals = 'omitted'): void
+    #[DataProvider('providerDOLLAR')]
+    public function testDOLLAR(mixed $expectedResult, mixed $amount = 'omitted', mixed $decimals = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -36,16 +33,15 @@ class DollarTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/DOLLAR.php';
     }
 
-    /**
-     * @dataProvider providerDollarArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerDollarArray')]
     public function testDollarArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=DOLLAR({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerDollarArray(): array

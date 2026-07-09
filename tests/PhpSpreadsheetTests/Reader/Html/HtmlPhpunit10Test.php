@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Html;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -7,15 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * There were problems running this test in HtmlTest with PhpUnit 10.
- * This replacement seem to work. I want it run in a separate
- * process because I am nervous about set_error_handler.
- *
- * @runTestsInSeparateProcesses
+ * This replacement seem to work.
  */
 class HtmlPhpunit10Test extends TestCase
 {
-    /** @var string */
-    private static $errorString;
+    private static string $errorString;
 
     protected function setUp(): void
     {

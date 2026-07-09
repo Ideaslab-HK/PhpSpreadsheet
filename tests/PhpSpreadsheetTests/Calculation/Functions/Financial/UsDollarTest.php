@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
 
 class UsDollarTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerUSDOLLAR
-     *
-     * @param mixed $expectedResult
-     */
-    public function testUSDOLLAR($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerUSDOLLAR')]
+    public function testUSDOLLAR(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCase('USDOLLAR', $expectedResult, $args);
     }

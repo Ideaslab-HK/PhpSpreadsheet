@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests;
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -8,12 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class RefRangeTest extends TestCase
 {
-    /**
-     * @param int|string $expectedResult
-     *
-     * @dataProvider providerRefRange
-     */
-    public function testRefRange($expectedResult, string $rangeString): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRefRange')]
+    public function testRefRange(int|string $expectedResult, string $rangeString): void
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use DateTimeImmutable;
@@ -11,19 +13,14 @@ use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DateValueTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $excelCalendar;
+    private int $excelCalendar;
 
-    /**
-     * @var string
-     */
-    private $returnDateType;
+    private string $returnDateType;
 
     protected function setUp(): void
     {
@@ -41,42 +38,36 @@ class DateValueTest extends TestCase
         Functions::setReturnDateType($this->returnDateType);
     }
 
-    private function expectationIsTemplate(string $expectedResult): bool
+    private function expectationIsTemplate(mixed $expectedResult): bool
     {
-        return is_string($expectedResult) && substr($expectedResult, 0, 2) === 'Y-';
+        return is_string($expectedResult) && str_starts_with($expectedResult, 'Y-');
     }
 
-    private function parseTemplatedExpectation(string $expectedResult): string
+    private function parseTemplatedExpectation(float|int|string $expectedResult): string
     {
-        return (string) DateValue::fromString(
+        /** @var float */
+        $x = DateValue::fromString(
             (new DateTimeImmutable(
-                str_replace('Y', (new DateTimeImmutable('now'))->format('Y'), $expectedResult)
+                str_replace('Y', (new DateTimeImmutable('now'))->format('Y'), (string) $expectedResult)
             ))->format('Y-m-d')
         );
+
+        return (string) $x;
     }
 
-    /**
-     * @dataProvider providerDATEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToDATEVALUE($expectedResult, ...$args): void
+    #[DataProvider('providerDATEVALUE')]
+    public function testDirectCallToDATEVALUE(int|string $expectedResult, bool|int|string $value): void
     {
         if ($this->expectationIsTemplate($expectedResult)) {
-            $expectedResult = $this->parseTemplatedExpectation($expectedResult);
+            $expectedResult = $this->parseTemplatedExpectation((string) $expectedResult);
         }
 
-        /** @scrutinizer ignore-call */
-        $result = DateValue::fromString(...$args);
+        $result = DateValue::fromString($value);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-8);
     }
 
-    /**
-     * @dataProvider providerDATEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEVALUEAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerDATEVALUE')]
+    public function testDATEVALUEAsFormula(float|int|string $expectedResult, mixed ...$args): void
     {
         if ($this->expectationIsTemplate($expectedResult)) {
             $expectedResult = $this->parseTemplatedExpectation($expectedResult);
@@ -87,16 +78,12 @@ class DateValueTest extends TestCase
         $calculation = Calculation::getInstance();
         $formula = "=DATEVALUE({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-8);
     }
 
-    /**
-     * @dataProvider providerDATEVALUE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEVALUEInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerDATEVALUE')]
+    public function testDATEVALUEInWorksheet(float|int|string $expectedResult, mixed ...$args): void
     {
         if ($this->expectationIsTemplate($expectedResult)) {
             $expectedResult = $this->parseTemplatedExpectation($expectedResult);
@@ -122,10 +109,17 @@ class DateValueTest extends TestCase
         return require 'tests/data/Calculation/DateTime/DATEVALUE.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyDATEVALUE
-     */
-    public function testDATEVALUEUnhappyPath(string $expectedException, ...$args): void
+    public function testRefArgNull(): void
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->getCell('A1')->setValue('=DATEVALUE(B1)');
+        self::assertSame('#VALUE!', $sheet->getCell('A1')->getCalculatedValue());
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    #[DataProvider('providerUnhappyDATEVALUE')]
+    public function testDATEVALUEUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -165,9 +159,8 @@ class DateValueTest extends TestCase
 
         $result = DateValue::fromString('2012-1-31');
         //    Must return an object...
-        self::assertIsObject($result);
         //    ... of the correct type
-        self::assertTrue(is_a($result, DateTimeInterface::class));
+        self::assertInstanceOf(DateTimeInterface::class, $result);
         //    ... with the correct value
         self::assertEquals($result->format('d-M-Y'), '31-Jan-2012');
     }
@@ -182,15 +175,14 @@ class DateValueTest extends TestCase
         self::assertEquals('#VALUE!', DateValue::fromString('1900-02-29'));
     }
 
-    /**
-     * @dataProvider providerDateValueArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerDateValueArray')]
     public function testDateValueArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=DATEVALUE({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

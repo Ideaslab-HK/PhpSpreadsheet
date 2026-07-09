@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\ConditionalFormatting\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -10,20 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 class BlankWizardTest extends TestCase
 {
-    /**
-     * @var Style
-     */
-    protected $style;
+    protected Style $style;
 
-    /**
-     * @var string
-     */
-    protected $range = '$C$3:$E$5';
+    protected string $range = '$C$3:$E$5';
 
-    /**
-     * @var Wizard
-     */
-    protected $wizardFactory;
+    protected Wizard $wizardFactory;
 
     protected function setUp(): void
     {
@@ -34,7 +27,6 @@ class BlankWizardTest extends TestCase
     public function testBlankWizard(): void
     {
         $ruleType = Wizard::BLANKS;
-        /** @var Wizard\Blanks $wizard */
         $wizard = $this->wizardFactory->newRule($ruleType);
         self::assertInstanceOf(Wizard\Blanks::class, $wizard);
         $wizard->setStyle($this->style);
@@ -52,7 +44,6 @@ class BlankWizardTest extends TestCase
     public function testNonBlankWizard(): void
     {
         $ruleType = Wizard::NOT_BLANKS;
-        /** @var Wizard\Blanks $wizard */
         $wizard = $this->wizardFactory->newRule($ruleType);
         self::assertInstanceOf(Wizard\Blanks::class, $wizard);
         $wizard->setStyle($this->style);
@@ -114,5 +105,29 @@ class BlankWizardTest extends TestCase
         $conditional = new Conditional();
         $conditional->setConditionType($ruleType);
         Wizard\Blanks::fromConditional($conditional);
+    }
+
+    protected string $unknown = 'UNKNOWN';
+
+    public function testInvalidOperator(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid Operation for Blanks CF Rule Wizard');
+        $ruleType = Wizard::BLANKS;
+        /** @var Wizard\Blanks $wizard */
+        $wizard = $this->wizardFactory->newRule($ruleType);
+        $ruleType = $this->unknown;
+        $wizard->$ruleType();
+    }
+
+    public function testStopIfTrue(): void
+    {
+        $ruleType = Wizard::BLANKS;
+        /** @var Wizard\Blanks $wizard */
+        $wizard = $this->wizardFactory->newRule($ruleType);
+        $wizard->setStopIfTrue(false);
+        self::assertFalse($wizard->getStopIfTrue());
+        $wizard->setStopIfTrue(true);
+        self::assertTrue($wizard->getStopIfTrue());
     }
 }

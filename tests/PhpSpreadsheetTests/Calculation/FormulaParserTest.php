@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcException;
 use PhpOffice\PhpSpreadsheet\Calculation\FormulaParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserTest extends TestCase
@@ -29,9 +32,8 @@ class FormulaParserTest extends TestCase
         self::assertSame(0, $result->getTokenCount());
     }
 
-    /**
-     * @dataProvider providerFormulaParser
-     */
+    /** @param mixed[][] $expectedResult */
+    #[DataProvider('providerFormulaParser')]
     public function testFormulaParser(string $formula, array $expectedResult): void
     {
         $formula = "=$formula";

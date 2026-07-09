@@ -1,76 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ComplexFunctions;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
 use PhpOffice\PhpSpreadsheetTests\Custom\ComplexAssert;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImSinTest extends TestCase
+class ImSinTest extends ComplexAssert
 {
-    const COMPLEX_PRECISION = 1E-12;
-
-    /**
-     * @var ComplexAssert
-     */
-    private $complexAssert;
-
-    protected function setUp(): void
+    #[DataProvider('providerIMSIN')]
+    public function testDirectCallToIMSIN(string $expectedResult, string $arg): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $this->complexAssert = new ComplexAssert();
+        $result = ComplexFunctions::IMSIN($arg);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMSIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToIMSIN($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
-        $result = ComplexFunctions::IMSIN(...$args);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
-    }
-
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerIMSIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMSINAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerIMSIN')]
+    public function testIMSINAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=IMSIN({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $this->trimIfQuoted((string) $result), self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMSIN
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMSINInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerIMSIN')]
+    public function testIMSINInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -82,10 +47,7 @@ class ImSinTest extends TestCase
         $result = $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        $this->assertComplexEquals($expectedResult, $result);
 
         $spreadsheet->disconnectWorksheets();
     }
@@ -95,10 +57,8 @@ class ImSinTest extends TestCase
         return require 'tests/data/Calculation/Engineering/IMSIN.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyIMSIN
-     */
-    public function testIMSINUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyIMSIN')]
+    public function testIMSINUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -123,15 +83,13 @@ class ImSinTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerImSinArray
-     */
+    #[DataProvider('providerImSinArray')]
     public function testImSinArray(array $expectedResult, string $complex): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=IMSIN({$complex})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEquals($expectedResult, $result);
     }
 

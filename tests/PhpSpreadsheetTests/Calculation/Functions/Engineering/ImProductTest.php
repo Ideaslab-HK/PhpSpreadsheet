@@ -1,76 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ComplexOperations;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
 use PhpOffice\PhpSpreadsheetTests\Custom\ComplexAssert;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImProductTest extends TestCase
+class ImProductTest extends ComplexAssert
 {
-    const COMPLEX_PRECISION = 1E-12;
-
     /**
-     * @var ComplexAssert
+     * @param string ...$args variadic arguments
      */
-    private $complexAssert;
-
-    protected function setUp(): void
+    #[DataProvider('providerIMPRODUCT')]
+    public function testDirectCallToIMPRODUCT(mixed $expectedResult, ...$args): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        $this->complexAssert = new ComplexAssert();
-    }
-
-    /**
-     * @dataProvider providerIMPRODUCT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToIMPRODUCT($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
         $result = ComplexOperations::IMPRODUCT(...$args);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    private function trimIfQuoted(string $value): string
-    {
-        return trim($value, '"');
-    }
-
-    /**
-     * @dataProvider providerIMPRODUCT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMPRODUCTAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerIMPRODUCT')]
+    public function testIMPRODUCTAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=IMPRODUCT({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $this->trimIfQuoted((string) $result), self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        /** @var float|int|string */
+        $result = $calculation->calculateFormula($formula);
+        $this->assertComplexEquals($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerIMPRODUCT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMPRODUCTInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerIMPRODUCT')]
+    public function testIMPRODUCTInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -82,10 +50,7 @@ class ImProductTest extends TestCase
         $result = $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-        self::assertTrue(
-            $this->complexAssert->assertComplexEquals($expectedResult, $result, self::COMPLEX_PRECISION),
-            $this->complexAssert->getErrorMessage()
-        );
+        $this->assertComplexEquals($expectedResult, $result);
 
         $spreadsheet->disconnectWorksheets();
     }
@@ -95,10 +60,8 @@ class ImProductTest extends TestCase
         return require 'tests/data/Calculation/Engineering/IMPRODUCT.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyIMPRODUCT
-     */
-    public function testIMPRODUCTUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyIMPRODUCT')]
+    public function testIMPRODUCTUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 

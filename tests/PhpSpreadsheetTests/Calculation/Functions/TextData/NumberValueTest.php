@@ -1,22 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class NumberValueTest extends AllSetupTeardown
 {
     const NV_PRECISION = 1.0E-8;
 
-    /**
-     * @dataProvider providerNUMBERVALUE
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     * @param mixed $decimal
-     * @param mixed $group
-     */
-    public function testNUMBERVALUE($expectedResult, $number = 'omitted', $decimal = 'omitted', $group = 'omitted'): void
+    #[DataProvider('providerNUMBERVALUE')]
+    public function testNUMBERVALUE(mixed $expectedResult, mixed $number = 'omitted', mixed $decimal = 'omitted', mixed $group = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -44,15 +40,14 @@ class NumberValueTest extends AllSetupTeardown
         return require 'tests/data/Calculation/TextData/NUMBERVALUE.php';
     }
 
-    /**
-     * @dataProvider providerNumberValueArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerNumberValueArray')]
     public function testNumberValueArray(array $expectedResult, string $argument1, string $argument2, string $argument3): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=NumberValue({$argument1}, {$argument2}, {$argument3})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, self::NV_PRECISION);
     }
 

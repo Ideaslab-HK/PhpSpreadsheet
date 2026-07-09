@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 class SumSqTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerSUMSQ
-     *
-     * @param mixed $expectedResult
-     */
-    public function testSUMSQ($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSUMSQ')]
+    public function testSUMSQ(mixed $expectedResult, mixed ...$args): void
     {
         $this->mightHaveException($expectedResult);
         $maxRow = 0;

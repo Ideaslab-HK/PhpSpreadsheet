@@ -1,19 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class QuotientTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerQUOTIENT
-     *
-     * @param mixed $expectedResult
-     * @param mixed $arg1
-     * @param mixed $arg2
-     */
-    public function testQUOTIENT($expectedResult, $arg1 = 'omitted', $arg2 = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQUOTIENT')]
+    public function testQUOTIENT(mixed $expectedResult, mixed $arg1 = 'omitted', mixed $arg2 = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -39,15 +35,13 @@ class QuotientTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/QUOTIENT.php';
     }
 
-    /**
-     * @dataProvider providerQuotientArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuotientArray')]
     public function testQuotientArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=QUOTIENT({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

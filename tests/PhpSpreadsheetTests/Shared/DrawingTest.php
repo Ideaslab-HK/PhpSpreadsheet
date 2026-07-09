@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
 use PhpOffice\PhpSpreadsheet\Shared\Drawing;
@@ -8,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class DrawingTest extends TestCase
 {
-    /**
-     * @dataProvider providerPixelsToCellDimension
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPixelsToCellDimension')]
     public function testPixelsToCellDimension(
         float $expectedResult,
         int $pixelSize,
@@ -25,9 +25,7 @@ class DrawingTest extends TestCase
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerCellDimensionToPixels
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCellDimensionToPixels')]
     public function testCellDimensionToPixels(
         int $expectedResult,
         int $cellSize,

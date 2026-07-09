@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LookupTest extends TestCase
 {
-    /**
-     * @dataProvider providerLOOKUP
-     *
-     * @param mixed $expectedResult
-     */
-    public function testLOOKUP($expectedResult, ...$args): void
+    #[DataProvider('providerLOOKUP')]
+    public function testLOOKUP(mixed $expectedResult, mixed ...$args): void
     {
         $result = LookupRef\Lookup::lookup(...$args);
         self::assertEquals($expectedResult, $result);
@@ -25,16 +24,14 @@ class LookupTest extends TestCase
         return require 'tests/data/Calculation/LookupRef/LOOKUP.php';
     }
 
-    /**
-     * @dataProvider providerLookupArray
-     */
+    #[DataProvider('providerLookupArray')]
     public function testLookupArray(array $expectedResult, string $values, string $lookup, string $return): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=LOOKUP({$values}, {$lookup}, {$return})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerLookupArray(): array

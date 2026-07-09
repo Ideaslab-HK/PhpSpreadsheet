@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class AbsTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerAbs
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     */
-    public function testAbs($expectedResult, $number = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAbs')]
+    public function testAbs(mixed $expectedResult, mixed $number = 'omitted'): void
     {
         $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
@@ -31,15 +28,13 @@ class AbsTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ABS.php';
     }
 
-    /**
-     * @dataProvider providerAbsArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAbsArray')]
     public function testAbsoluteArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ABS({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -7,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\CellIterator;
 use PhpOffice\PhpSpreadsheet\Worksheet\ColumnIterator;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ColumnIteratorEmptyTest extends TestCase
@@ -30,9 +33,7 @@ class ColumnIteratorEmptyTest extends TestCase
         return $sheet;
     }
 
-    /**
-     * @dataProvider emptyColumnBasic
-     */
+    #[DataProvider('emptyColumnBasicProvider')]
     public function testIteratorEmptyColumn(string $columnId, bool $expectedEmpty): void
     {
         $spreadsheet = new Spreadsheet();
@@ -45,7 +46,7 @@ class ColumnIteratorEmptyTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
-    public static function emptyColumnBasic(): array
+    public static function emptyColumnBasicProvider(): array
     {
         return [
             ['A', false],
@@ -60,9 +61,7 @@ class ColumnIteratorEmptyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emptyColumnNullAsEmpty
-     */
+    #[DataProvider('emptyColumnNullAsEmptyProvider')]
     public function testIteratorEmptyColumnWithNull(string $columnId, bool $expectedEmpty): void
     {
         $spreadsheet = new Spreadsheet();
@@ -75,7 +74,7 @@ class ColumnIteratorEmptyTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
-    public static function emptyColumnNullAsEmpty(): array
+    public static function emptyColumnNullAsEmptyProvider(): array
     {
         return [
             ['A', false],
@@ -90,9 +89,7 @@ class ColumnIteratorEmptyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emptyColumnEmptyStringAsEmpty
-     */
+    #[DataProvider('emptyColumnEmptyStringAsEmptyProvider')]
     public function testIteratorEmptyColumnWithEmptyString(string $columnId, bool $expectedEmpty): void
     {
         $spreadsheet = new Spreadsheet();
@@ -105,7 +102,7 @@ class ColumnIteratorEmptyTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
-    public static function emptyColumnEmptyStringAsEmpty(): array
+    public static function emptyColumnEmptyStringAsEmptyProvider(): array
     {
         return [
             ['A', false],
@@ -120,9 +117,7 @@ class ColumnIteratorEmptyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emptyColumnNullAndEmptyStringAsEmpty
-     */
+    #[DataProvider('emptyColumnNullAndEmptyStringAsEmptyProvider')]
     public function testIteratorEmptyColumnWithNullAndEmptyString(string $columnId, bool $expectedEmpty): void
     {
         $spreadsheet = new Spreadsheet();
@@ -137,7 +132,7 @@ class ColumnIteratorEmptyTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
-    public static function emptyColumnNullAndEmptyStringAsEmpty(): array
+    public static function emptyColumnNullAndEmptyStringAsEmptyProvider(): array
     {
         return [
             ['A', false],

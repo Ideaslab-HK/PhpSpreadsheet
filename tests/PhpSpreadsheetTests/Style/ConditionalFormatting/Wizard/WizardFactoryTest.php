@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\ConditionalFormatting\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Conditional;
 use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\Wizard;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class WizardFactoryTest extends TestCase
 {
-    /**
-     * @var Wizard
-     */
-    protected $wizardFactory;
+    protected Wizard $wizardFactory;
 
     protected function setUp(): void
     {
@@ -22,10 +22,9 @@ class WizardFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider basicWizardFactoryProvider
-     *
      * @psalm-param class-string<object> $expectedWizard
      */
+    #[DataProvider('basicWizardFactoryProvider')]
     public function testBasicWizardFactory(string $ruleType, string $expectedWizard): void
     {
         $wizard = $this->wizardFactory->newRule($ruleType);
@@ -46,10 +45,9 @@ class WizardFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider conditionalProvider
-     */
-    public function testWizardFromConditional(string $sheetName, string $cellAddress, array $expectedWizads): void
+    /** @param mixed[] $expectedWizards */
+    #[DataProvider('conditionalProvider')]
+    public function testWizardFromConditional(string $sheetName, string $cellAddress, array $expectedWizards): void
     {
         $filename = 'tests/data/Style/ConditionalFormatting/CellMatcher.xlsx';
         $reader = IOFactory::createReader('Xlsx');
@@ -65,8 +63,9 @@ class WizardFactoryTest extends TestCase
 
         foreach ($conditionals as $index => $conditional) {
             $wizard = Wizard::fromConditional($conditional);
-            self::assertEquals($expectedWizads[$index], get_class($wizard));
+            self::assertEquals($expectedWizards[$index], $wizard::class);
         }
+        $spreadsheet->disconnectWorksheets();
     }
 
     public static function conditionalProvider(): array

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Information;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\Value;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IsTextTest extends TestCase
@@ -14,12 +17,8 @@ class IsTextTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @dataProvider providerIsText
-     *
-     * @param mixed $value
-     */
-    public function testIsText(bool $expectedResult, $value): void
+    #[DataProvider('providerIsText')]
+    public function testIsText(bool $expectedResult, mixed $value): void
     {
         $result = Value::isText($value);
         self::assertEquals($expectedResult, $result);
@@ -30,16 +29,14 @@ class IsTextTest extends TestCase
         return require 'tests/data/Calculation/Information/IS_TEXT.php';
     }
 
-    /**
-     * @dataProvider providerIsTextArray
-     */
+    #[DataProvider('providerIsTextArray')]
     public function testIsTextArray(array $expectedResult, string $values): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ISTEXT({$values})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerIsTextArray(): array

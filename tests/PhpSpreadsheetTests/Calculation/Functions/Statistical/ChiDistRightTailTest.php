@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ChiDistRightTailTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerCHIDIST
-     *
-     * @param mixed $expectedResult
-     */
-    public function testCHIDIST($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCHIDIST')]
+    public function testCHIDIST(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCaseReference('CHISQ.DIST.RT', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class ChiDistRightTailTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/CHIDISTRightTail.php';
     }
 
-    /**
-     * @dataProvider providerChiDistRightTailArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerChiDistRightTailArray')]
     public function testChiDistRightTailArray(array $expectedResult, string $values, string $degrees): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=CHISQ.DIST.RT({$values}, {$degrees})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

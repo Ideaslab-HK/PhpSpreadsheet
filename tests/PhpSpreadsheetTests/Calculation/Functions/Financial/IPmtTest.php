@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
+
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class IPmtTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerIPMT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIPMT($expectedResult, array $args): void
+    /** @param mixed[] $args */
+    #[DataProvider('providerIPMT')]
+    public function testIPMT(mixed $expectedResult, array $args): void
     {
         $this->runTestCase('IPMT', $expectedResult, $args);
     }

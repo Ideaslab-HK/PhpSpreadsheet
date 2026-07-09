@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
+use DateTimeInterface;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Date;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
@@ -10,19 +13,14 @@ use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DateTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $excelCalendar;
+    private int $excelCalendar;
 
-    /**
-     * @var string
-     */
-    private $returnDateType;
+    private string $returnDateType;
 
     protected function setUp(): void
     {
@@ -40,39 +38,27 @@ class DateTest extends TestCase
         Functions::setReturnDateType($this->returnDateType);
     }
 
-    /**
-     * @dataProvider providerDATE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToDATE($expectedResult, ...$args): void
+    #[DataProvider('providerDATE')]
+    public function testDirectCallToDATE(float|string $expectedResult, int|string $year, null|bool|float|int|string $month, float|int|string $day): void
     {
-        $result = Date::fromYMD(...$args);
+        $result = Date::fromYMD($year, $month, $day);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerDATE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerDATE')]
+    public function testDATEAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=DATE({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerDATE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerDATE')]
+    public function testDATEInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -94,10 +80,8 @@ class DateTest extends TestCase
         return require 'tests/data/Calculation/DateTime/DATE.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyDATE
-     */
-    public function testDATEUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyDATE')]
+    public function testDATEUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -118,7 +102,7 @@ class DateTest extends TestCase
     public static function providerUnhappyDATE(): array
     {
         return [
-            ['Formula Error: Wrong number of arguments for DATE() function', 2023, 03],
+            ['Formula Error: Wrong number of arguments for DATE() function', 2023, 3],
         ];
     }
 
@@ -136,9 +120,8 @@ class DateTest extends TestCase
 
         $result = Date::fromYMD(2012, 1, 31);
         //    Must return an object...
-        self::assertIsObject($result);
         //    ... of the correct type
-        self::assertTrue(is_a($result, 'DateTimeInterface'));
+        self::assertInstanceOf(DateTimeInterface::class, $result);
         //    ... with the correct value
         self::assertEquals($result->format('d-M-Y'), '31-Jan-2012');
     }
@@ -154,15 +137,14 @@ class DateTest extends TestCase
         self::assertEquals($result, ExcelError::NAN());
     }
 
-    /**
-     * @dataProvider providerDateArray
-     */
+    /** @param array<mixed> $expectedResult */
+    #[DataProvider('providerDateArray')]
     public function testDateArray(array $expectedResult, string $year, string $month, string $day): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=DATE({$year}, {$month}, {$day})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 
@@ -220,9 +202,7 @@ class DateTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerDateArrayException
-     */
+    #[DataProvider('providerDateArrayException')]
     public function testDateArrayException(string $year, string $month, string $day): void
     {
         $calculation = Calculation::getInstance();
@@ -231,7 +211,7 @@ class DateTest extends TestCase
         $this->expectExceptionMessage('Formulae with more than two array arguments are not supported');
 
         $formula = "=DATE({$year}, {$month}, {$day})";
-        $calculation->_calculateFormulaValue($formula);
+        $calculation->calculateFormula($formula);
     }
 
     public static function providerDateArrayException(): array

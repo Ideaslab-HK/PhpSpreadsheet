@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests;
 
 use PhpOffice\PhpSpreadsheet\CellReferenceHelper;
@@ -8,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class CellReferenceHelperTest extends TestCase
 {
-    /**
-     * @dataProvider cellReferenceHelperInsertColumnsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperInsertColumnsProvider')]
     public function testCellReferenceHelperInsertColumns(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 2, 0);
@@ -54,9 +54,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperDeleteColumnsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperDeleteColumnsProvider')]
     public function testCellReferenceHelperDeleteColumns(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', -2, 0);
@@ -90,9 +88,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperInsertRowsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperInsertRowsProvider')]
     public function testCellReferenceHelperInsertRows(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 0, 2);
@@ -122,9 +118,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperDeleteRowsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperDeleteRowsProvider')]
     public function testCellReferenceHelperDeleteRows(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 0, -2);
@@ -150,9 +144,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperInsertColumnsAbsoluteProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperInsertColumnsAbsoluteProvider')]
     public function testCellReferenceHelperInsertColumnsAbsolute(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 2, 0);
@@ -178,9 +170,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperDeleteColumnsAbsoluteProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperDeleteColumnsAbsoluteProvider')]
     public function testCellReferenceHelperDeleteColumnsAbsolute(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', -2, 0);
@@ -206,9 +196,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperInsertRowsAbsoluteProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperInsertRowsAbsoluteProvider')]
     public function testCellReferenceHelperInsertRowsAbsolute(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 0, 2);
@@ -234,9 +222,7 @@ class CellReferenceHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider cellReferenceHelperDeleteRowsAbsoluteProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cellReferenceHelperDeleteRowsAbsoluteProvider')]
     public function testCellReferenceHelperDeleteRowsAbsolute(string $expectedResult, string $cellAddress): void
     {
         $cellReferenceHelper = new CellReferenceHelper('E5', 0, -2);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Writer\Html;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -9,9 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class MemoryDrawingOffsetTest extends TestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
     public function testMemoryDrawingOffset(int $w, int $h, int $x, int $y): void
     {
         $spreadsheet = new Spreadsheet();
@@ -36,7 +36,7 @@ class MemoryDrawingOffsetTest extends TestCase
         unset($spreadsheet);
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [33, 19, 0, 20],

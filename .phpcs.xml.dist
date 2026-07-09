@@ -5,9 +5,8 @@
     <file>samples</file>
     <file>src</file>
     <file>tests</file>
-
-    <exclude-pattern>samples/Header.php</exclude-pattern>
-    <exclude-pattern>*/tests/Core/*/*Test\.(inc|css|js)$</exclude-pattern>
+    <file>infra</file>
+    <file>bin</file>
 
     <arg name="report-width" value="200"/>
     <arg name="parallel" value="80"/>

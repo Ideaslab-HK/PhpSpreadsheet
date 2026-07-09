@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
 
 class PriceTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerPRICE
-     *
-     * @param mixed $expectedResult
-     */
-    public function testPRICE($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPRICE')]
+    public function testPRICE(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCase('PRICE', $expectedResult, $args);
     }
@@ -19,12 +17,8 @@ class PriceTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Financial/PRICE.php';
     }
 
-    /**
-     * @dataProvider providerPRICE3
-     *
-     * @param mixed $expectedResult
-     */
-    public function testPRICE3($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPRICE3')]
+    public function testPRICE3(mixed $expectedResult, mixed ...$args): void
     {
         // These results (PRICE function with basis codes 2 and 3)
         // agree with published algorithm, LibreOffice, and Gnumeric.

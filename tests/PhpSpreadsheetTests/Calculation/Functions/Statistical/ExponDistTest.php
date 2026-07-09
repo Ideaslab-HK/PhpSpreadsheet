@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ExponDistTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerEXPONDIST
-     *
-     * @param mixed $expectedResult
-     */
-    public function testEXPONDIST($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEXPONDIST')]
+    public function testEXPONDIST(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('EXPONDIST', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class ExponDistTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/EXPONDIST.php';
     }
 
-    /**
-     * @dataProvider providerExponDistArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerExponDistArray')]
     public function testExponDistArray(array $expectedResult, string $values, string $lambdas): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=EXPONDIST({$values}, {$lambdas}, false)";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

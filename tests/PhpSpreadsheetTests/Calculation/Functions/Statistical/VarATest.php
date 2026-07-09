@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 class VarATest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerVARA
-     *
-     * @param mixed $expectedResult
-     */
-    public function testVARA($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerVARA')]
+    public function testVARA(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('VARA', $expectedResult, ...$args);
     }
@@ -19,12 +17,8 @@ class VarATest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/VARA.php';
     }
 
-    /**
-     * @dataProvider providerOdsVARA
-     *
-     * @param mixed $expectedResult
-     */
-    public function testOdsVARA($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerOdsVARA')]
+    public function testOdsVARA(mixed $expectedResult, mixed ...$args): void
     {
         $this->setOpenOffice();
         $this->runTestCases('VARA', $expectedResult, ...$args);

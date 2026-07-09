@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class RoundUpTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerRoundUp
-     *
-     * @param mixed $expectedResult
-     * @param mixed $formula
-     */
-    public function testRoundUp($expectedResult, $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRoundUp')]
+    public function testRoundUp(float|int|string $expectedResult, float|int|string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -30,15 +27,13 @@ class RoundUpTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/ROUNDUP.php';
     }
 
-    /**
-     * @dataProvider providerRoundUpArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRoundUpArray')]
     public function testRoundUpArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ROUNDUP({$argument1},{$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

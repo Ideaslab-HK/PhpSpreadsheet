@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class NormInvTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerNORMINV
-     *
-     * @param mixed $expectedResult
-     */
-    public function testNORMINV($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNORMINV')]
+    public function testNORMINV(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('NORMINV', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class NormInvTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/NORMINV.php';
     }
 
-    /**
-     * @dataProvider providerNormInvArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormInvArray')]
     public function testNormInvArray(array $expectedResult, string $probabilities, string $mean, string $stdDev): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=NORMINV({$probabilities}, {$mean}, {$stdDev})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

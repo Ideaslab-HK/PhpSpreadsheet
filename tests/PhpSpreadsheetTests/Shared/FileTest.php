@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
 use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
@@ -8,11 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class FileTest extends TestCase
 {
-    /** @var bool */
-    private $uploadFlag = false;
+    private bool $uploadFlag = false;
 
-    /** @var string */
-    private $tempfile = '';
+    private string $tempfile = '';
 
     protected function setUp(): void
     {
@@ -92,12 +92,12 @@ class FileTest extends TestCase
         }
         $this->tempfile = $temp = File::temporaryFileName();
         file_put_contents($temp, '');
-        if (chmod($temp, 0070) === false) {
+        if (chmod($temp, 7 * 8) === false) { // octal 070
             self::markTestSkipped('chmod failed');
         }
         self::assertFalse(File::testFileNoThrow($temp));
         $this->expectException(ReaderException::class);
-        $this->expectExceptionMessage('for reading');
+        $this->expectExceptionMessage('is not readable');
         File::assertFile($temp);
     }
 

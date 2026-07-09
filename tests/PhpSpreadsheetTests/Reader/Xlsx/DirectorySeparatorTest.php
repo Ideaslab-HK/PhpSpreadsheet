@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -8,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class DirectorySeparatorTest extends TestCase
 {
-    /**
-     * @dataProvider providerDirectorySeparator
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDirectorySeparator')]
     public function testDirectorySeparatorIdentify(string $fileName): void
     {
         $filename = "tests/data/Reader/XLSX/{$fileName}";
@@ -19,9 +19,7 @@ class DirectorySeparatorTest extends TestCase
         self::assertSame('Xlsx', $reader);
     }
 
-    /**
-     * @dataProvider providerDirectorySeparator
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDirectorySeparator')]
     public function testDirectorySeparatorWorksheetNames(string $fileName): void
     {
         $filename = "tests/data/Reader/XLSX/{$fileName}";
@@ -32,9 +30,7 @@ class DirectorySeparatorTest extends TestCase
         self::assertSame('Sheet', $sheetList[0]);
     }
 
-    /**
-     * @dataProvider providerDirectorySeparator
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDirectorySeparator')]
     public function testDirectorySeparatorWorksheetInfo(string $fileName): void
     {
         $filename = "tests/data/Reader/XLSX/{$fileName}";
@@ -47,9 +43,7 @@ class DirectorySeparatorTest extends TestCase
         self::assertSame(21, (int) $sheetData[0]['totalColumns']);
     }
 
-    /**
-     * @dataProvider providerDirectorySeparator
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDirectorySeparator')]
     public function testDirectorySeparatorLoad(string $fileName): void
     {
         $filename = "tests/data/Reader/XLSX/{$fileName}";

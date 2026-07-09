@@ -1,63 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Engineering\ComplexFunctions;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImArgumentTest extends TestCase
+class ImArgumentTest extends AllSetupTeardown
 {
     const COMPLEX_PRECISION = 1E-12;
 
-    protected function setUp(): void
+    #[DataProvider('providerIMARGUMENT')]
+    public function testDirectCallToIMARGUMENT(float|int|string $expectedResult, string $arg): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-    }
-
-    /**
-     * @dataProvider providerIMARGUMENT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToIMARGUMENT($expectedResult, ...$args): void
-    {
-        /** @scrutinizer ignore-call */
-        $result = ComplexFunctions::IMARGUMENT(...$args);
+        $result = ComplexFunctions::IMARGUMENT($arg);
         self::assertEqualsWithDelta($expectedResult, $result, self::COMPLEX_PRECISION);
     }
 
-    /**
-     * @dataProvider providerIMARGUMENT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMARGUMENTAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerIMARGUMENT')]
+    public function testIMARGUMENTAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=IMARGUMENT({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, self::COMPLEX_PRECISION);
     }
 
-    /**
-     * @dataProvider providerIMARGUMENT
-     *
-     * @param mixed $expectedResult
-     */
-    public function testIMARGUMENTInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerIMARGUMENT')]
+    public function testIMARGUMENTInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
-        $spreadsheet = new Spreadsheet();
-        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $this->getSheet();
         $argumentCells = $arguments->populateWorksheet($worksheet);
         $formula = "=IMARGUMENT({$argumentCells})";
 
@@ -65,8 +46,6 @@ class ImArgumentTest extends TestCase
             ->getCell('A1')
             ->getCalculatedValue();
         self::assertEqualsWithDelta($expectedResult, $result, self::COMPLEX_PRECISION);
-
-        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerIMARGUMENT(): array
@@ -74,15 +53,12 @@ class ImArgumentTest extends TestCase
         return require 'tests/data/Calculation/Engineering/IMARGUMENT.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyIMARGUMENT
-     */
-    public function testIMARGUMENTUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyIMARGUMENT')]
+    public function testIMARGUMENTUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
-        $spreadsheet = new Spreadsheet();
-        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $this->getSheet();
         $argumentCells = $arguments->populateWorksheet($worksheet);
         $formula = "=IMARGUMENT({$argumentCells})";
 
@@ -91,8 +67,6 @@ class ImArgumentTest extends TestCase
         $worksheet->setCellValue('A1', $formula)
             ->getCell('A1')
             ->getCalculatedValue();
-
-        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerUnhappyIMARGUMENT(): array

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -8,10 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class RowColumnReferenceTest extends TestCase
 {
-    /**
-     * @var Spreadsheet
-     */
-    protected $spreadSheet;
+    protected Spreadsheet $spreadSheet;
 
     protected function setUp(): void
     {
@@ -36,9 +35,7 @@ class RowColumnReferenceTest extends TestCase
         $this->spreadSheet->setActiveSheetIndexByName('summary sheet');
     }
 
-    /**
-     * @dataProvider providerCurrentWorksheetFormulae
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentWorksheetFormulae')]
     public function testCurrentWorksheet(string $formula, float $expectedResult): void
     {
         $worksheet = $this->spreadSheet->getActiveSheet();

@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class GammaDistTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerGAMMADIST
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGAMMADIST($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGAMMADIST')]
+    public function testGAMMADIST(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('GAMMA.DIST', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class GammaDistTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/GAMMADIST.php';
     }
 
-    /**
-     * @dataProvider providerGammaDistArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGammaDistArray')]
     public function testGammaDistArray(array $expectedResult, string $values, string $alpha, string $beta): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=GAMMA.DIST({$values}, {$alpha}, {$beta}, false)";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

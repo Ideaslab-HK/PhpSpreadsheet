@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     [
         'ABCDEFGHI',
@@ -28,6 +30,10 @@ return [
     [
         'FALSE',
         false,
+    ],
+    'error code unchanged' => [
+        '#VALUE!',
+        '#VALUE!',
     ],
     'no arguments' => ['exception'],
 ];

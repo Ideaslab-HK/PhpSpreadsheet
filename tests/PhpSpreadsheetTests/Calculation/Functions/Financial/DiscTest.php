@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Financial;
 
 class DiscTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerDISC
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDISC($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDISC')]
+    public function testDISC(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCase('DISC', $expectedResult, $args);
     }

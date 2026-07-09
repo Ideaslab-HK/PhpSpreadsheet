@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet;
 
 use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
@@ -14,9 +16,18 @@ class Worksheet2Test extends TestCase
         $invalid = Worksheet::getInvalidCharacters();
         self::assertSame(['*', ':', '/', '\\', '?', '[', ']'], $invalid);
         $worksheet = new Worksheet();
-        self::assertEmpty($worksheet->getStyles());
+        $coord1 = $worksheet->getCoordinates();
+        self::assertSame([], $coord1);
+        $worksheet->getCell('B3')->setValue(1);
+        $worksheet->getCell('G2')->setValue(2);
+        $coord2 = $worksheet->getCoordinates(false); // in order added
+        self::assertSame(['B3', 'G2'], $coord2);
+        $coord3 = $worksheet->getCoordinates(); // sorted by row then column
+        self::assertSame(['G2', 'B3'], $coord3);
+        $worksheet = new Worksheet();
         $worksheet->disconnectCells();
-        self::assertSame([], $worksheet->getCoordinates());
+        $coord4 = $worksheet->getCoordinates();
+        self::assertSame([], $coord4);
     }
 
     public function testHighestColumn(): void
@@ -71,13 +82,34 @@ class Worksheet2Test extends TestCase
 
     public function testFreeze(): void
     {
+        $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $pane = $worksheet->getActivePane();
+        self::assertEmpty($pane);
+        $worksheet->setSelectedCells('D3');
+        $worksheet->freezePane('A2');
+        $freeze = $this->getPane($worksheet);
+        $pane = $worksheet->getActivePane();
+        $selected = $worksheet->getSelectedCells();
+        self::assertSame('A2', $freeze);
+        self::assertSame('D3', $selected);
+        self::assertSame('bottomLeft', $pane);
+        $worksheet->unfreezePane();
+        $freeze = $this->getPane($worksheet);
+        self::assertNull($freeze);
+        $pane = $worksheet->getActivePane();
+        $selected = $worksheet->getSelectedCells();
+        self::assertEquals('', $pane);
+        self::assertSame('D3', $selected);
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public function testFreezeA1(): void
+    {
         $worksheet = new Worksheet();
         $worksheet->freezePane('A1');
         $freeze = $this->getPane($worksheet);
-        self::assertSame('A1', $freeze);
-        $worksheet->unfreezePane();
-        // Scrutinizer is an idiot. If it still complains, I give up.
-        self::assertNull($this->getPane($worksheet));
+        self::assertNull($freeze);
     }
 
     public function testInsertBeforeRowOne(): void

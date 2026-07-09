@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -7,44 +9,32 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\DateParts;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MonthTest extends TestCase
 {
-    /**
-     * @dataProvider providerMONTH
-     *
-     * @param mixed $expectedResultExcel
-     */
-    public function testDirectCallToMONTH($expectedResultExcel, ...$args): void
+    #[DataProvider('providerMONTH')]
+    public function testDirectCallToMONTH(mixed $expectedResultExcel, mixed ...$args): void
     {
-        /** @scrutinizer ignore-call */
         $result = DateParts::month(...$args);
         self::assertSame($expectedResultExcel, $result);
     }
 
-    /**
-     * @dataProvider providerMONTH
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMONTHAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerMONTH')]
+    public function testMONTHAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=MONTH({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerMONTH
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMONTHInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerMONTH')]
+    public function testMONTHInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -66,10 +56,8 @@ class MonthTest extends TestCase
         return require 'tests/data/Calculation/DateTime/MONTH.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyMONTH
-     */
-    public function testMONTHUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyMONTH')]
+    public function testMONTHUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -94,15 +82,14 @@ class MonthTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerMonthArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerMonthArray')]
     public function testMonthArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MONTH({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

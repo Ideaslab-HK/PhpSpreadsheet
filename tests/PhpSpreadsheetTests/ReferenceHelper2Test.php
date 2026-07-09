@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests;
 
 use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
@@ -14,7 +16,8 @@ class ReferenceHelper2Test extends TestCase
         $this->expectException(SpreadsheetException::class);
         $this->expectExceptionMessage('Cloning a Singleton');
         $referenceHelper = ReferenceHelper::getInstance();
-        clone $referenceHelper;
+        $x = clone $referenceHelper;
+        $x->updateFormulaReferences();
     }
 
     public function testRenamedWorksheetInFormula(): void

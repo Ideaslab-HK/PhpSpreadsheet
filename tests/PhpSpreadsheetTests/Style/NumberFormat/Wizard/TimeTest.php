@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\NumberFormat\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Time;
@@ -8,12 +10,11 @@ use PHPUnit\Framework\TestCase;
 class TimeTest extends TestCase
 {
     /**
-     * @dataProvider providerTime
-     *
      * @param null|string|string[] $separators
      * @param string[] $formatBlocks
      */
-    public function testTime(string $expectedResult, $separators = null, array $formatBlocks = []): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTime')]
+    public function testTime(string $expectedResult, string|array|null $separators = null, array $formatBlocks = []): void
     {
         $wizard = new Time($separators, ...$formatBlocks);
         self::assertSame($expectedResult, (string) $wizard);

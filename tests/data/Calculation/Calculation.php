@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+/** @return mixed[] */
 function calculationTestDataGenerator(): array
 {
     $dataArray1 = [

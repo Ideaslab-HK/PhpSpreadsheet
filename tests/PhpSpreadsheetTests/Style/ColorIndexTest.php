@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style;
 
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Styles;
@@ -7,9 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ColorIndexTest extends TestCase
 {
-    /**
-     * @dataProvider providerColorIndexes
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColorIndexes')]
     public function testColorIndex(string $expectedResult, string $xml, bool $background = false): void
     {
         $sxml = simplexml_load_string($xml);

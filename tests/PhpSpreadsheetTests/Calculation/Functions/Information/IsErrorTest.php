@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Information;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IsErrorTest extends TestCase
@@ -14,12 +17,8 @@ class IsErrorTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @dataProvider providerIsError
-     *
-     * @param mixed $value
-     */
-    public function testIsError(bool $expectedResult, $value): void
+    #[DataProvider('providerIsError')]
+    public function testIsError(bool $expectedResult, mixed $value): void
     {
         $result = ErrorValue::isError($value);
         self::assertEquals($expectedResult, $result);
@@ -30,16 +29,14 @@ class IsErrorTest extends TestCase
         return require 'tests/data/Calculation/Information/IS_ERROR.php';
     }
 
-    /**
-     * @dataProvider providerIsErrorArray
-     */
+    #[DataProvider('providerIsErrorArray')]
     public function testIsErrorArray(array $expectedResult, string $values): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=ISERROR({$values})";
-        $result = $calculation->_calculateFormulaValue($formula);
-        self::assertEquals($expectedResult, $result);
+        $result = $calculation->calculateFormula($formula);
+        self::assertSame($expectedResult, $result);
     }
 
     public static function providerIsErrorArray(): array

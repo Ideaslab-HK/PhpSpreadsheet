@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class SinTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerSin
-     *
-     * @param mixed $expectedResult
-     */
-    public function testSin($expectedResult, string $formula): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSin')]
+    public function testSin(mixed $expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -26,15 +24,13 @@ class SinTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/SIN.php';
     }
 
-    /**
-     * @dataProvider providerSinArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSinArray')]
     public function testSinArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=SIN({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

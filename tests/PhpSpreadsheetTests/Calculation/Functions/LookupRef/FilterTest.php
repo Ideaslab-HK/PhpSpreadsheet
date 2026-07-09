@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
@@ -52,6 +54,7 @@ class FilterTest extends TestCase
         self::assertSame($expectedResult, $result);
     }
 
+    /** @return array<array{string, string, string, int}> */
     protected function sampleDataForRow(): array
     {
         return [
@@ -74,6 +77,7 @@ class FilterTest extends TestCase
         ];
     }
 
+    /** @return array<array<int|string>> */
     protected function sampleDataForColumn(): array
     {
         return [

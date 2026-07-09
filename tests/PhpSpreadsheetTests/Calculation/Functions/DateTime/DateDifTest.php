@@ -1,54 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use DateTime;
 use DateTimeImmutable;
-use Exception;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Days;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Difference;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DateDifTest extends TestCase
 {
-    /**
-     * @dataProvider providerDATEDIF
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToDATEDIF($expectedResult, string ...$args): void
+    /** @param array<mixed>|int|string $expectedResult */
+    #[DataProvider('providerDATEDIF')]
+    public function testDirectCallToDATEDIF(array|int|string $expectedResult, string ...$args): void
     {
         $result = Difference::interval(...$args);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerDATEDIF
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEDIFAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerDATEDIF')]
+    public function testDATEDIFAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=DATEDIF({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerDATEDIF
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDATEDIFInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerDATEDIF')]
+    public function testDATEDIFInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -70,10 +60,8 @@ class DateDifTest extends TestCase
         return require 'tests/data/Calculation/DateTime/DATEDIF.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyDATEDIF
-     */
-    public function testDATEDIFUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyDATEDIF')]
+    public function testDATEDIFUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -105,16 +93,8 @@ class DateDifTest extends TestCase
         self::assertSame(31, Days::between($obj1, $obj2));
     }
 
-    public function testNonDateObject(): void
-    {
-        $obj1 = new Exception();
-        $obj2 = new DateTimeImmutable('2000-2-29');
-        self::assertSame(ExcelError::VALUE(), Days::between($obj1, $obj2));
-    }
-
-    /**
-     * @dataProvider providerDateDifArray
-     */
+    /** @param array<mixed> $expectedResult */
+    #[DataProvider('providerDateDifArray')]
     public function testDateDifArray(array $expectedResult, string $startDate, string $endDate, ?string $methods): void
     {
         $calculation = Calculation::getInstance();
@@ -124,7 +104,7 @@ class DateDifTest extends TestCase
         } else {
             $formula = "=DATEDIF({$startDate}, {$endDate}, {$methods})";
         }
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 

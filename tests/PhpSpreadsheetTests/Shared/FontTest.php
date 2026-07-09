@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
 use PhpOffice\PhpSpreadsheet\Shared\Font;
@@ -39,13 +41,8 @@ class FontTest extends TestCase
         self::assertFalse($result);
     }
 
-    /**
-     * @dataProvider providerFontSizeToPixels
-     *
-     * @param mixed $expectedResult
-     * @param mixed $size
-     */
-    public function testFontSizeToPixels($expectedResult, $size): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFontSizeToPixels')]
+    public function testFontSizeToPixels(float|int $expectedResult, float|int $size): void
     {
         $result = Font::fontSizeToPixels($size);
         self::assertEquals($expectedResult, $result);
@@ -56,13 +53,8 @@ class FontTest extends TestCase
         return require 'tests/data/Shared/FontSizeToPixels.php';
     }
 
-    /**
-     * @dataProvider providerInchSizeToPixels
-     *
-     * @param mixed $expectedResult
-     * @param mixed $size
-     */
-    public function testInchSizeToPixels($expectedResult, $size): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInchSizeToPixels')]
+    public function testInchSizeToPixels(float|int $expectedResult, float|int $size): void
     {
         $result = Font::inchSizeToPixels($size);
         self::assertEqualsWithDelta($expectedResult, $result, self::FONT_PRECISION);
@@ -73,13 +65,8 @@ class FontTest extends TestCase
         return require 'tests/data/Shared/InchSizeToPixels.php';
     }
 
-    /**
-     * @dataProvider providerCentimeterSizeToPixels
-     *
-     * @param mixed $expectedResult
-     * @param mixed $size
-     */
-    public function testCentimeterSizeToPixels($expectedResult, $size): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCentimeterSizeToPixels')]
+    public function testCentimeterSizeToPixels(float $expectedResult, float $size): void
     {
         $result = Font::centimeterSizeToPixels($size);
         self::assertEqualsWithDelta($expectedResult, $result, self::FONT_PRECISION);
@@ -102,9 +89,7 @@ class FontTest extends TestCase
         self::assertEquals(4, $width);
     }
 
-    /**
-     * @dataProvider providerCalculateApproximateColumnWidth
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCalculateApproximateColumnWidth')]
     public function testCalculateApproximateColumnWidth(
         float $expectedWidth,
         StyleFont $font,

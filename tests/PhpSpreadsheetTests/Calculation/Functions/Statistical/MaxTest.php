@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 class MaxTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMAX
-     *
-     * @param mixed $expectedResult
-     */
-    public function testMAX($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMAX')]
+    public function testMAX(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCaseReference('MAX', $expectedResult, ...$args);
     }

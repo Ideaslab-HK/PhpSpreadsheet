@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class DegreesTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerDEGREES
-     *
-     * @param mixed $expectedResult
-     * @param mixed $number
-     */
-    public function testDegrees($expectedResult, $number = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDEGREES')]
+    public function testDegrees(mixed $expectedResult, mixed $number = 'omitted'): void
     {
         $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
@@ -31,15 +28,13 @@ class DegreesTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/DEGREES.php';
     }
 
-    /**
-     * @dataProvider providerDegreesArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDegreesArray')]
     public function testDegreesArray(array $expectedResult, string $array): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=DEGREES({$array})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-12);
     }
 

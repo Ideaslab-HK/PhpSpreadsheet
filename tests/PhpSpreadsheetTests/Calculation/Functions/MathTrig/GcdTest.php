@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 class GcdTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerGCD
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGCD($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGCD')]
+    public function testGCD(mixed $expectedResult, mixed ...$args): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();

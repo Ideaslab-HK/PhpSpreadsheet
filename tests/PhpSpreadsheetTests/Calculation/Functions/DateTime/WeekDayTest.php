@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -7,14 +9,12 @@ use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Week;
 use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheetTests\Calculation\Functions\FormulaArguments;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class WeekDayTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $excelCalendar;
+    private int $excelCalendar;
 
     protected function setUp(): void
     {
@@ -30,40 +30,27 @@ class WeekDayTest extends TestCase
         SharedDate::setExcelCalendar($this->excelCalendar);
     }
 
-    /**
-     * @dataProvider providerWEEKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testDirectCallToWEEKDAY($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKDAY')]
+    public function testDirectCallToWEEKDAY(int|string $expectedResult, bool|int|string $dateValue, null|int|string $style = null): void
     {
-        /** @scrutinizer ignore-call */
-        $result = Week::day(...$args);
+        $result = ($style === null) ? Week::day($dateValue) : Week::day($dateValue, $style);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWEEKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWEEKDAYAsFormula($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKDAY')]
+    public function testWEEKDAYAsFormula(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
         $calculation = Calculation::getInstance();
         $formula = "=WEEKDAY({$arguments})";
 
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertSame($expectedResult, $result);
     }
 
-    /**
-     * @dataProvider providerWEEKDAY
-     *
-     * @param mixed $expectedResult
-     */
-    public function testWEEKDAYInWorksheet($expectedResult, ...$args): void
+    #[DataProvider('providerWEEKDAY')]
+    public function testWEEKDAYInWorksheet(mixed $expectedResult, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -85,10 +72,8 @@ class WeekDayTest extends TestCase
         return require 'tests/data/Calculation/DateTime/WEEKDAY.php';
     }
 
-    /**
-     * @dataProvider providerUnhappyWEEKDAY
-     */
-    public function testWEEKDAYUnhappyPath(string $expectedException, ...$args): void
+    #[DataProvider('providerUnhappyWEEKDAY')]
+    public function testWEEKDAYUnhappyPath(string $expectedException, mixed ...$args): void
     {
         $arguments = new FormulaArguments(...$args);
 
@@ -122,15 +107,14 @@ class WeekDayTest extends TestCase
         self::assertEquals(6, Week::day(null));
     }
 
-    /**
-     * @dataProvider providerWeekDayArray
-     */
+    /** @param mixed[] $expectedResult */
+    #[DataProvider('providerWeekDayArray')]
     public function testWeekDayArray(array $expectedResult, string $dateValues, string $styles): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=WEEKDAY({$dateValues}, {$styles})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

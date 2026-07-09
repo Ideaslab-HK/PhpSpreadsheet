@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Worksheet\AutoFilter;
 
 use DateTimeImmutable;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
 use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AutoFilterYearTest extends SetupTeardown
 {
@@ -20,9 +23,8 @@ class AutoFilterYearTest extends SetupTeardown
         ];
     }
 
-    /**
-     * @dataProvider providerYear
-     */
+    /** @param mixed[] $expectedVisible */
+    #[DataProvider('providerYear')]
     public function testYears(array $expectedVisible, string $rule): void
     {
         // Loop to avoid rare edge case where first calculation
@@ -45,6 +47,8 @@ class AutoFilterYearTest extends SetupTeardown
             }
             ++$row;
             $sheet->getCell("A$row")->setValue('=DATE(2041, 1, 1)'); // beyond epoch
+            ++$row;
+            $sheet->getCell("A$row")->setValue(7000989091802000122); // issue 4696
             ++$row; // empty row at end
             $this->maxRow = $maxRow = $row;
             $autoFilter = $sheet->getAutoFilter();

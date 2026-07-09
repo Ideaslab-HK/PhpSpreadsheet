@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 
 return [
@@ -18,4 +20,5 @@ return [
     [ExcelError::VALUE(), '13:01PM'],
     [ExcelError::VALUE(), false],
     [ExcelError::VALUE(), true],
+    'do not try to parse if no digits' => [ExcelError::VALUE(), 'x'],
 ];

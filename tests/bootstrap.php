@@ -1,9 +1,9 @@
 <?php
 
-setlocale(LC_ALL, 'en_US.utf8');
+declare(strict_types=1);
 
-// PHP 5.3 Compat
-//date_default_timezone_set('Europe/London');
+setlocale(LC_ALL, 'en_US.utf8');
+ini_set('error_reporting', (string) E_ALL);
 
 function phpunit10ErrorHandler(int $errno, string $errstr, string $filename, int $lineno): bool
 {
@@ -26,13 +26,10 @@ function phpunit10ErrorHandler(int $errno, string $errstr, string $filename, int
             return true; // message suppressed - stop error handling
         }
 
-        throw new \Exception("$errstr $filename $lineno");
+        throw new Exception("$errstr $filename $lineno");
     }
 
     return false; // continue error handling
 }
 
-if (!method_exists(\PHPUnit\Framework\TestCase::class, 'setOutputCallback')) {
-    ini_set('error_reporting', E_ALL);
-    set_error_handler('phpunit10ErrorHandler');
-}
+set_error_handler('phpunit10ErrorHandler');

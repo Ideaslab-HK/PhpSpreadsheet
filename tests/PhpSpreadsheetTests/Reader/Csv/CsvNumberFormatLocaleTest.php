@@ -1,38 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Csv;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
+use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CsvNumberFormatLocaleTest extends TestCase
 {
-    /**
-     * @var bool
-     */
-    private $localeAdjusted;
+    private bool $localeAdjusted;
 
     /**
      * @var false|string
      */
     private $currentLocale;
 
-    /**
-     * @var string
-     */
-    protected $filename;
+    protected string $filename;
 
-    /**
-     * @var Csv
-     */
-    protected $csvReader;
+    protected Csv $csvReader;
 
     protected function setUp(): void
     {
         $this->currentLocale = setlocale(LC_ALL, '0');
 
-        if (!setlocale(LC_ALL, 'de_DE.UTF-8', 'deu_deu')) {
+        if (!setlocale(LC_ALL, 'de_DE.UTF-8', 'deu_deu.utf8')) {
             $this->localeAdjusted = false;
 
             return;
@@ -42,25 +37,30 @@ class CsvNumberFormatLocaleTest extends TestCase
 
         $this->filename = 'tests/data/Reader/CSV/NumberFormatTest.de.csv';
         $this->csvReader = new Csv();
+        StringHelper::setCurrencyCode(null);
+        StringHelper::setThousandsSeparator(null);
+        StringHelper::setDecimalSeparator(null);
     }
 
     protected function tearDown(): void
     {
+        StringHelper::setCurrencyCode(null);
+        StringHelper::setThousandsSeparator(null);
+        StringHelper::setDecimalSeparator(null);
         if ($this->localeAdjusted && is_string($this->currentLocale)) {
             setlocale(LC_ALL, $this->currentLocale);
         }
     }
 
-    /**
-     * @dataProvider providerNumberFormatNoConversionTest
-     *
-     * @param mixed $expectedValue
-     */
-    public function testNumberFormatNoConversion($expectedValue, string $expectedFormat, string $cellAddress): void
+    #[DataProvider('providerNumberFormatNoConversionTest')]
+    public function testNumberFormatNoConversion(mixed $expectedValue, string $expectedFormat, string $cellAddress): void
     {
         if (!$this->localeAdjusted) {
             self::markTestSkipped('Unable to set locale for testing.');
         }
+        $localeconv = localeconv();
+        self::assertSame(',', $localeconv['decimal_point'], 'unexpected change to German decimal separator');
+        self::assertSame('.', $localeconv['thousands_sep'], 'unexpected change to German thousands separator');
 
         $spreadsheet = $this->csvReader->load($this->filename);
         $worksheet = $spreadsheet->getActiveSheet();
@@ -69,6 +69,7 @@ class CsvNumberFormatLocaleTest extends TestCase
 
         self::assertSame($expectedValue, $cell->getValue(), 'Expected value check');
         self::assertSame($expectedFormat, $cell->getFormattedValue(), 'Format mask check');
+        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerNumberFormatNoConversionTest(): array
@@ -92,18 +93,15 @@ class CsvNumberFormatLocaleTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerNumberValueConversionTest
-     *
-     * @param mixed $expectedValue
-     *
-     * @runInSeparateProcess
-     */
-    public function testNumberValueConversion($expectedValue, string $cellAddress): void
+    #[DataProvider('providerNumberValueConversionTest')]
+    public function testNumberValueConversion(mixed $expectedValue, string $cellAddress): void
     {
         if (!$this->localeAdjusted) {
             self::markTestSkipped('Unable to set locale for testing.');
         }
+        $localeconv = localeconv();
+        self::assertSame(',', $localeconv['decimal_point'], 'unexpected change to German decimal separator');
+        self::assertSame('.', $localeconv['thousands_sep'], 'unexpected change to German thousands separator');
 
         $this->csvReader->castFormattedNumberToNumeric(true);
         $spreadsheet = $this->csvReader->load($this->filename);
@@ -113,6 +111,7 @@ class CsvNumberFormatLocaleTest extends TestCase
 
         self::assertSame(DataType::TYPE_NUMERIC, $cell->getDataType(), 'Datatype check');
         self::assertSame($expectedValue, $cell->getValue(), 'Expected value check');
+        $spreadsheet->disconnectWorksheets();
     }
 
     public static function providerNumberValueConversionTest(): array

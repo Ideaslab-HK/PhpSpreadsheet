@@ -1,26 +1,19 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Cannot call method getTokenSubType\\(\\) on PhpOffice\\\\PhpSpreadsheet\\\\Calculation\\\\FormulaToken\\|null\\.$#"
-			count: 4
-			path: src/PhpSpreadsheet/Calculation/FormulaParser.php
-
-		-
-			message: "#^Cannot call method getTokenType\\(\\) on PhpOffice\\\\PhpSpreadsheet\\\\Calculation\\\\FormulaToken\\|null\\.$#"
-			count: 9
-			path: src/PhpSpreadsheet/Calculation/FormulaParser.php
-
-		-
-			message: "#^Cannot call method setTokenSubType\\(\\) on PhpOffice\\\\PhpSpreadsheet\\\\Calculation\\\\FormulaToken\\|null\\.$#"
-			count: 5
-			path: src/PhpSpreadsheet/Calculation/FormulaParser.php
-
-		-
-			message: "#^Cannot call method setValue\\(\\) on PhpOffice\\\\PhpSpreadsheet\\\\Calculation\\\\FormulaToken\\|null\\.$#"
-			count: 5
-			path: src/PhpSpreadsheet/Calculation/FormulaParser.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between PhpOffice\\\\PhpSpreadsheet\\\\Calculation\\\\FormulaToken and null will always evaluate to false\\.$#"
+			message: '#^Parameter \#1 \$array of function array_multisort expects array, mixed given\.$#'
+			identifier: argument.type
 			count: 1
-			path: src/PhpSpreadsheet/Calculation/FormulaParser.php
+			path: src/PhpSpreadsheet/Calculation/LookupRef/Sort.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/PhpSpreadsheet/ReferenceHelper.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PhpSpreadsheet/ReferenceHelper.php

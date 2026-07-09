@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\Protection;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
+/** @var PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 $helper->log('Create new Spreadsheet object');
 $spreadsheet = new Spreadsheet();
 
@@ -74,19 +75,19 @@ $helper->log('Add comments');
 
 $spreadsheet->getActiveSheet()->getComment('E11')->setAuthor('PhpSpreadsheet');
 $commentRichText = $spreadsheet->getActiveSheet()->getComment('E11')->getText()->createTextRun('PhpSpreadsheet:');
-$commentRichText->getFont()->setBold(true);
+$commentRichText->getFontOrThrow()->setBold(true);
 $spreadsheet->getActiveSheet()->getComment('E11')->getText()->createTextRun("\r\n");
 $spreadsheet->getActiveSheet()->getComment('E11')->getText()->createTextRun('Total amount on the current invoice, excluding VAT.');
 
 $spreadsheet->getActiveSheet()->getComment('E12')->setAuthor('PhpSpreadsheet');
 $commentRichText = $spreadsheet->getActiveSheet()->getComment('E12')->getText()->createTextRun('PhpSpreadsheet:');
-$commentRichText->getFont()->setBold(true);
+$commentRichText->getFontOrThrow()->setBold(true);
 $spreadsheet->getActiveSheet()->getComment('E12')->getText()->createTextRun("\r\n");
 $spreadsheet->getActiveSheet()->getComment('E12')->getText()->createTextRun('Total amount of VAT on the current invoice.');
 
 $spreadsheet->getActiveSheet()->getComment('E13')->setAuthor('PhpSpreadsheet');
 $commentRichText = $spreadsheet->getActiveSheet()->getComment('E13')->getText()->createTextRun('PhpSpreadsheet:');
-$commentRichText->getFont()->setBold(true);
+$commentRichText->getFontOrThrow()->setBold(true);
 $spreadsheet->getActiveSheet()->getComment('E13')->getText()->createTextRun("\r\n");
 $spreadsheet->getActiveSheet()->getComment('E13')->getText()->createTextRun('Total amount on the current invoice, including VAT.');
 $spreadsheet->getActiveSheet()->getComment('E13')->setWidth('100pt');
@@ -100,9 +101,9 @@ $richText = new RichText();
 $richText->createText('This invoice is ');
 
 $payable = $richText->createTextRun('payable within thirty days after the end of the month');
-$payable->getFont()->setBold(true);
-$payable->getFont()->setItalic(true);
-$payable->getFont()->setColor(new Color(Color::COLOR_DARKGREEN));
+$payable->getFontOrThrow()->setBold(true);
+$payable->getFontOrThrow()->setItalic(true);
+$payable->getFontOrThrow()->setColor(new Color(Color::COLOR_DARKGREEN));
 
 $richText->createText(', unless specified otherwise on the invoice.');
 
@@ -247,16 +248,18 @@ $spreadsheet->getActiveSheet()->getStyle('B1')->getProtection()->setLocked(Prote
 
 // Add a hyperlink to the sheet
 $helper->log('Add a hyperlink to an external website');
-$spreadsheet->getActiveSheet()->setCellValue('E26', 'www.phpexcel.net');
+$spreadsheet->getActiveSheet()->setCellValue('E26', 'www.example.com');
 $spreadsheet->getActiveSheet()->getCell('E26')->getHyperlink()->setUrl('https://www.example.com');
 $spreadsheet->getActiveSheet()->getCell('E26')->getHyperlink()->setTooltip('Navigate to website');
 $spreadsheet->getActiveSheet()->getStyle('E26')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('E26')->getFont()->setHyperlinkTheme();
 
 $helper->log('Add a hyperlink to another cell on a different worksheet within the workbook');
 $spreadsheet->getActiveSheet()->setCellValue('E27', 'Terms and conditions');
 $spreadsheet->getActiveSheet()->getCell('E27')->getHyperlink()->setUrl("sheet://'Terms and conditions'!A1");
 $spreadsheet->getActiveSheet()->getCell('E27')->getHyperlink()->setTooltip('Review terms and conditions');
 $spreadsheet->getActiveSheet()->getStyle('E27')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+$spreadsheet->getActiveSheet()->getStyle('E27')->getFont()->setHyperlinkTheme();
 
 // Add a drawing to the worksheet
 $helper->log('Add a drawing to the worksheet');

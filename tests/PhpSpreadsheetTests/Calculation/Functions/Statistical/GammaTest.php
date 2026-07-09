@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class GammaTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerGAMMA
-     *
-     * @param mixed $expectedResult
-     */
-    public function testGAMMA($expectedResult, ...$args): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGAMMA')]
+    public function testGAMMA(mixed $expectedResult, mixed ...$args): void
     {
         $this->runTestCases('GAMMA', $expectedResult, ...$args);
     }
@@ -21,15 +19,13 @@ class GammaTest extends AllSetupTeardown
         return require 'tests/data/Calculation/Statistical/GAMMA.php';
     }
 
-    /**
-     * @dataProvider providerGammaArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGammaArray')]
     public function testGammaArray(array $expectedResult, string $values): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=GAMMA({$values})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 

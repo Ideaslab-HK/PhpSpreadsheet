@@ -4,13 +4,14 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Settings;
 
 require __DIR__ . '/../Header.php';
+/** @var PhpOffice\PhpSpreadsheet\Helper\Sample $helper */
 
 // Change these values to select the Rendering library that you wish to use
 //Settings::setChartRenderer(\PhpOffice\PhpSpreadsheet\Chart\Renderer\JpGraph::class);
-Settings::setChartRenderer(\PhpOffice\PhpSpreadsheet\Chart\Renderer\MtJpGraphRenderer::class);
+Settings::setChartRenderer(PhpOffice\PhpSpreadsheet\Chart\Renderer\MtJpGraphRenderer::class);
 
 $inputFileType = 'Xlsx';
-$inputFileNames = $helper->getTemporaryFolder() . '/33_Chart_create_*.xlsx';
+$inputFileNamesString = $helper->getTemporaryFolder() . '/33_Chart_create_*.xlsx';
 
 if ((isset($argc)) && ($argc > 1)) {
     $inputFileNames = [];
@@ -18,16 +19,15 @@ if ((isset($argc)) && ($argc > 1)) {
         $inputFileNames[] = __DIR__ . '/../templates/' . $argv[$i];
     }
 } else {
-    $inputFileNames = glob($inputFileNames);
+    $inputFileNames = glob($inputFileNamesString) ?: [];
 }
 if (count($inputFileNames) === 1) {
+    /** @var string[] */
     $unresolvedErrors = [];
 } else {
+    /** @var string[] */
     $unresolvedErrors = [
-        // The following spreadsheet was created by 3rd party software,
-        // and doesn't include the data that usually accompanies a chart.
-        // That is good enough for Excel, but not for JpGraph.
-        '33_Chart_create_bar_stacked.xlsx',
+        //'33_Chart_create_bar_stacked.xlsx', // fixed with mitoteam/jpgraph 10.3
     ];
 }
 foreach ($inputFileNames as $inputFileName) {
@@ -65,9 +65,9 @@ foreach ($inputFileNames as $inputFileName) {
             natsort($chartNames);
             foreach ($chartNames as $j => $chartName) {
                 $i = $renderedCharts + $j;
-                $chart = $worksheet->getChartByName($chartName);
+                $chart = $worksheet->getChartByNameOrThrow($chartName);
                 if ($chart->getTitle() !== null) {
-                    $caption = '"' . implode(' ', $chart->getTitle()->getCaption()) . '"';
+                    $caption = '"' . $chart->getTitle()->getCaptionText($spreadsheet) . '"';
                 } else {
                     $caption = 'Untitled';
                 }

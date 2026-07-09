@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -10,6 +12,7 @@ use PhpOffice\PhpSpreadsheetTests\Functional\AbstractFunctional;
 
 class AutoFilterEvaluateTest extends AbstractFunctional
 {
+    /** @return int[] */
     private function getVisibleSheet(Worksheet $sheet): array
     {
         $actualVisible = [];

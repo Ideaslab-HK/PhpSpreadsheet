@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Style\NumberFormat\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Date;
@@ -10,12 +12,11 @@ use PHPUnit\Framework\TestCase;
 class DateTimeTest extends TestCase
 {
     /**
-     * @dataProvider providerDateTime
-     *
      * @param null|string|string[] $separators
-     * @param string[] $formatBlocks
+     * @param array<Date|string|Time> $formatBlocks
      */
-    public function testDateTime(string $expectedResult, $separators, array $formatBlocks): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDateTime')]
+    public function testDateTime(string $expectedResult, string|null|array $separators, array $formatBlocks): void
     {
         $wizard = new DateTime($separators, ...$formatBlocks);
         self::assertSame($expectedResult, (string) $wizard);

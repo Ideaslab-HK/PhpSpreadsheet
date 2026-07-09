@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Reader\Html;
 
+use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PHPUnit\Framework\TestCase;
 
@@ -14,6 +17,7 @@ class Issue2942Test extends TestCase
         $spreadsheet = $reader->loadFromString($content);
         $sheet = $spreadsheet->getActiveSheet();
         self::assertSame('éàâèî', $sheet->getCell('A1')->getValue());
+        $spreadsheet->disconnectWorksheets();
     }
 
     public function testLoadFromFile(): void
@@ -32,5 +36,39 @@ class Issue2942Test extends TestCase
         self::assertSame('അആ', $sheet->getCell('B3')->getValue());
         self::assertSame('กขฃ', $sheet->getCell('C3')->getValue());
         self::assertSame('✀✐✠', $sheet->getCell('D3')->getValue());
+        $spreadsheet->disconnectWorksheets();
+    }
+
+    public function testLoadFromStringExtendFailure(): void
+    {
+        $this->expectException(ReaderException::class);
+        $this->expectExceptionMessage('Failed to load content ');
+        $content = '<table><tbody><tr><td>éàâèî</td></tr></tbody></table>';
+        $reader = new HtmlExtend();
+        $reader->loadFromString($content);
+    }
+
+    public function testInfo(): void
+    {
+        $file = 'tests/data/Reader/HTML/utf8chars.charset.html';
+        $reader = new Html();
+        $info = $reader->listWorksheetInfo($file);
+        self::assertCount(1, $info);
+        $info0 = $info[0];
+        self::assertSame('Test Utf-8 characters voilà', $info0['worksheetName']);
+        self::assertSame('D', $info0['lastColumnLetter']);
+        self::assertSame(3, $info0['lastColumnIndex']);
+        self::assertSame(7, $info0['totalRows']);
+        self::assertSame(4, $info0['totalColumns']);
+        $names = $reader->listWorksheetNames($file);
+        self::assertCount(1, $names);
+        self::assertSame('Test Utf-8 characters voilà', $names[0]);
+
+        // Following ignored, just make sure it's executable.
+        $reader->setLoadSheetsOnly([$names[0]]);
+        $spreadsheet = $reader->load($file);
+        $sheet = $spreadsheet->getActiveSheet();
+        self::assertSame('✀✐✠', $sheet->getCell('D3')->getValue());
+        $spreadsheet->disconnectWorksheets();
     }
 }

@@ -1,19 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class ModTest extends AllSetupTeardown
 {
-    /**
-     * @dataProvider providerMOD
-     *
-     * @param mixed $expectedResult
-     * @param mixed $dividend
-     * @param mixed $divisor
-     */
-    public function testMOD($expectedResult, $dividend = 'omitted', $divisor = 'omitted'): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMOD')]
+    public function testMOD(mixed $expectedResult, mixed $dividend = 'omitted', mixed $divisor = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
         $sheet = $this->getSheet();
@@ -39,15 +35,13 @@ class ModTest extends AllSetupTeardown
         return require 'tests/data/Calculation/MathTrig/MOD.php';
     }
 
-    /**
-     * @dataProvider providerModArray
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerModArray')]
     public function testModArray(array $expectedResult, string $argument1, string $argument2): void
     {
         $calculation = Calculation::getInstance();
 
         $formula = "=MOD({$argument1}, {$argument2})";
-        $result = $calculation->_calculateFormulaValue($formula);
+        $result = $calculation->calculateFormula($formula);
         self::assertEqualsWithDelta($expectedResult, $result, 1.0e-14);
     }
 
