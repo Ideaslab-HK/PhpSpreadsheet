@@ -402,7 +402,7 @@ class Chart extends WriterPart
                 $objWriter->endElement();
             } elseif (($chartType === DataSeries::TYPE_BARCHART) || ($chartType === DataSeries::TYPE_BARCHART_3D)) {
                 $objWriter->startElement('c:gapWidth');
-                $gap_width = $layout->getGapWidth();
+                $gap_width = $layout?->getGapWidth();
                 $objWriter->writeAttribute('val', (string) ($gap_width ?? 150));
                 $objWriter->endElement();
 
@@ -506,7 +506,7 @@ class Chart extends WriterPart
                 $this->writeValueAxis($objWriter, $xAxisLabel, $chartType, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis(), DataSeries::VALUE_AXIS_POSITION_LEFT);
             } else {
                 // $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis());
-                $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $yAxis ?? new Axis(), $layout->getXAxisRotation(), DataSeries::VALUE_AXIS_POSITION_BOTTOM);
+                $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $yAxis ?? new Axis(), $layout?->getXAxisRotation(), DataSeries::VALUE_AXIS_POSITION_BOTTOM);
                 $dataTable = $plotArea->getDataTable();
                 if ($dataTable !== null) {
                     $this->writeDataTable($objWriter, $dataTable);
@@ -520,8 +520,8 @@ class Chart extends WriterPart
         }
 
         if ($useSecondaryYAxis) {
-		    $this->writeValueAxis($objWriter, $yAxisLabel, $chartType, $secondaryId1, $secondaryId2, $valIsMultiLevelSeries, $xAxis, DataSeries::VALUE_AXIS_POSITION_RIGHT);
-		    $this->writeCategoryAxis($objWriter, $xAxisLabel, $secondaryId1, $secondaryId2, $catIsMultiLevelSeries, $yAxis, NULL, DataSeries::VALUE_AXIS_POSITION_TOP);
+		    $this->writeValueAxis($objWriter, $yAxisLabel, $chartType, $secondaryId1, $secondaryId2, $valIsMultiLevelSeries, $xAxis ?? new Axis(), DataSeries::VALUE_AXIS_POSITION_RIGHT);
+		    $this->writeCategoryAxis($objWriter, $xAxisLabel, $secondaryId1, $secondaryId2, $catIsMultiLevelSeries, $yAxis ?? new Axis(), NULL, DataSeries::VALUE_AXIS_POSITION_TOP);
 	    }
 
         $stops = $plotArea->getGradientFillStops();
@@ -671,7 +671,7 @@ class Chart extends WriterPart
         // ideaslab
         // Skip showing values on 學校整體平均 in report 2
         if ($chart_type == DataSeries::TYPE_LINECHART) {
-            $this->writeDataLabelsBool($objWriter, 'showVal', '0');
+            $this->writeDataLabelsBool($objWriter, 'showVal', 0);
         } else {
             $this->writeDataLabelsBool($objWriter, 'showVal', $chartLayout->getShowVal());
         }
@@ -985,7 +985,7 @@ class Chart extends WriterPart
      *
      * @param null|string $groupType Chart type
      */
-    private function writeValueAxis(XMLWriter $objWriter, ?Title $yAxisLabel, ?string $groupType, string $id1, string $id2, bool $isMultiLevelSeries, Axis $xAxis, ?string $axisPosition = 'l'): void
+    private function writeValueAxis(XMLWriter $objWriter, ?Title $yAxisLabel, ?string $groupType, string $id1, string $id2, bool $isMultiLevelSeries, Axis $xAxis, string $axisPosition = 'l'): void
     {
         $objWriter->startElement('c:' . Axis::AXIS_TYPE_VALUE);
         $majorGridlines = $xAxis->getMajorGridlines();
