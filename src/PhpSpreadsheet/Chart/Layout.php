@@ -201,10 +201,10 @@ class Layout
         }
     
         if (isset($layout['gapWidth'])) {
-        	$this->gapWidth = $layout['gapWidth'];
+        	$this->gapWidth = (int) $layout['gapWidth'];
         }
         if (isset($layout['xAxisRotation'])) {
-        	$this->xAxisRotation = $layout['xAxisRotation'];
+        	$this->xAxisRotation = (string) $layout['xAxisRotation'];
         }
     }
 
@@ -612,16 +612,20 @@ class Layout
     	return $this->gapWidth;
     }
 
-    public function setGapWidth(?int $value) {
-    	$this->gapWidth = $value;
+    public function setGapWidth(?int $value): self {
+	    $this->gapWidth = $value;
+
+	    return $this;
     }
 
     public function getXAxisRotation(): ?string {
     	return $this->xAxisRotation;
     }
 
-    public function setXAxisRotation(?string $value) {
-    	$this->xAxisRotation = $value;
+    public function setXAxisRotation(?string $value): self {
+	    $this->xAxisRotation = $value;
+
+	    return $this;
     }
 
     /**

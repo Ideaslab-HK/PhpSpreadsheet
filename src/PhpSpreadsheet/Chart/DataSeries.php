@@ -110,10 +110,10 @@ class DataSeries
      */
     private array $plotBubbleSizes = [];
 
-	/**
-	 * Value Axis Position.
-	 */
-	private ?string $valueAxisPosition;
+    /**
+     * Value Axis Position.
+     */
+    private string $valueAxisPosition;
 
     /**
      * Create a new DataSeries.

@@ -324,8 +324,8 @@ class Chart extends WriterPart
         }
 
         // ideaslab legend font size 16.0
-        $objWriter->writeAttribute('sz', 1600);
-        $objWriter->writeAttribute('baseline', 0);
+        $objWriter->writeAttribute('sz', '1600');
+        $objWriter->writeAttribute('baseline', '0');
 
         $objWriter->endElement(); // a:defRpr
         $objWriter->endElement(); // a:pPr
@@ -403,7 +403,7 @@ class Chart extends WriterPart
             } elseif (($chartType === DataSeries::TYPE_BARCHART) || ($chartType === DataSeries::TYPE_BARCHART_3D)) {
                 $objWriter->startElement('c:gapWidth');
                 $gap_width = $layout->getGapWidth();
-                $objWriter->writeAttribute('val', isset($gap_width) ? $gap_width : '150');
+                $objWriter->writeAttribute('val', (string) ($gap_width ?? 150));
                 $objWriter->endElement();
 
                 if ($plotGroupingType == 'percentStacked' || $plotGroupingType == 'stacked') {
@@ -611,12 +611,12 @@ class Chart extends WriterPart
      * Write Data Labels.
      *
      * @param XMLWriter $objWriter XML Writer
-     * @param \PhpOffice\PhpSpreadsheet\Chart\Layout $chartLayout Chart layout
+    * @param \PhpOffice\PhpSpreadsheet\Chart\Layout|null $chartLayout Chart layout
      * @param $chart_type
      */
-    private function writeDataLabels(XMLWriter $objWriter, Layout $chartLayout, string $chart_type): void
+    private function writeDataLabels(XMLWriter $objWriter, ?Layout $chartLayout, string $chart_type): void
     {
-        if (!isset($chartLayout)) {
+        if ($chartLayout === null) {
             return;
         }
         $objWriter->startElement('c:dLbls');
