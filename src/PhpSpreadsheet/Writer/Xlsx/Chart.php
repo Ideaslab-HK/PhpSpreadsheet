@@ -1044,7 +1044,7 @@ class Chart extends WriterPart
             $objWriter->endElement(); //end majorGridLines
         }
 
-        if ($axisPosition === DataSeries::VALUE_AXIS_POSITION_LEFT) {
+        if ($axisPosition === DataSeries::VALUE_AXIS_POSITION_LEFT && $majorGridlines !== null) {
 		    $objWriter->startElement('c:majorGridlines');
 		    $objWriter->startElement('c:spPr');
 
