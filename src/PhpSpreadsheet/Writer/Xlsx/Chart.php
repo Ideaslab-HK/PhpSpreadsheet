@@ -323,7 +323,7 @@ class Chart extends WriterPart
             $this->writeEffects($objWriter, $legendText);
         }
 
-        // ideaslab legend font size 16.0
+        // Ideaslab overrides legend font size 16.0
         $objWriter->writeAttribute('sz', '1600');
         $objWriter->writeAttribute('baseline', '0');
 
@@ -506,7 +506,7 @@ class Chart extends WriterPart
                 $this->writeValueAxis($objWriter, $xAxisLabel, $chartType, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis(), DataSeries::VALUE_AXIS_POSITION_LEFT);
             } else {
                 // $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis());
-                $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $yAxis ?? new Axis(), $layout?->getXAxisRotation(), DataSeries::VALUE_AXIS_POSITION_BOTTOM);
+                $this->writeCategoryAxis($objWriter, $xAxisLabel, $id1, $id2, $catIsMultiLevelSeries, $xAxis ?? new Axis(), $layout?->getXAxisRotation(), DataSeries::VALUE_AXIS_POSITION_BOTTOM);
                 $dataTable = $plotArea->getDataTable();
                 if ($dataTable !== null) {
                     $this->writeDataTable($objWriter, $dataTable);
@@ -1044,6 +1044,8 @@ class Chart extends WriterPart
             $objWriter->endElement(); //end majorGridLines
         }
 
+    // Ideaslab: majorGridlines implemented above
+    if (false) {
         if ($axisPosition === DataSeries::VALUE_AXIS_POSITION_LEFT && $majorGridlines !== null) {
 		    $objWriter->startElement('c:majorGridlines');
 		    $objWriter->startElement('c:spPr');
@@ -1152,6 +1154,7 @@ class Chart extends WriterPart
 		    $objWriter->endElement(); //end spPr
 		    $objWriter->endElement(); //end majorGridLines
         }
+    }
 
         if ($minorGridlines !== null && $minorGridlines->getObjectState()) {
             $objWriter->startElement('c:minorGridlines');
@@ -1275,7 +1278,8 @@ class Chart extends WriterPart
 
             $crossBetween = $xAxis->getCrossBetween();
             // Ideaslab override!?
-            // $crossBetween = 'between';
+            // Not needed anymore. 'between' is the default for bar chart.
+            // $crossBetween = 'between'; 
             if ($crossBetween !== '') {
                 $objWriter->startElement('c:crossBetween');
                 $objWriter->writeAttribute('val', $crossBetween);
@@ -1472,7 +1476,7 @@ class Chart extends WriterPart
             $plotLabel = $plotGroup->getPlotLabelByIndex($plotSeriesIdx);
             if ($plotLabel && $groupType != DataSeries::TYPE_LINECHART) {
                 $fillColor = $plotLabel->getFillColor();
-                if ($fillColor !== null && !is_array($fillColor)) {
+                if (!empty($fillColor) && !is_array($fillColor)) {
                     $objWriter->startElement('c:spPr');
                     $objWriter->startElement('a:solidFill');
                     $objWriter->startElement('a:srgbClr');
@@ -1686,8 +1690,6 @@ class Chart extends WriterPart
 
                 if (($groupType == DataSeries::TYPE_PIECHART) || ($groupType == DataSeries::TYPE_PIECHART_3D) || ($groupType == DataSeries::TYPE_DONUTCHART)) {
                     $plotStyle = $plotGroup->getPlotStyle();
-                    // Ideaslab override!?
-                    // $plotStyle = 8;
                     if (is_numeric($plotStyle)) {
                         $objWriter->startElement('c:explosion');
                         $objWriter->writeAttribute('val', $plotStyle);
