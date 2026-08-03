@@ -93,6 +93,16 @@ class DataSeries
     private bool $smoothLine;
 
     /**
+     * Plot this data series on the secondary axis.
+     */
+    private bool $secondaryAxis = false;
+
+    /**
+     * Display tick labels on the secondary horizontal and vertical axes.
+     */
+    private bool $secondaryAxisLabelsVisible = true;
+
+    /**
      * Plot Values.
      *
      * @var DataSeriesValues[]
@@ -362,6 +372,30 @@ class DataSeries
     public function setSmoothLine(bool $smoothLine): static
     {
         $this->smoothLine = $smoothLine;
+
+        return $this;
+    }
+
+    public function isSecondaryAxis(): bool
+    {
+        return $this->secondaryAxis;
+    }
+
+    public function setSecondaryAxis(bool $secondaryAxis = true): static
+    {
+        $this->secondaryAxis = $secondaryAxis;
+
+        return $this;
+    }
+
+    public function areSecondaryAxisLabelsVisible(): bool
+    {
+        return $this->secondaryAxisLabelsVisible;
+    }
+
+    public function setSecondaryAxisLabelsVisible(bool $visible): static
+    {
+        $this->secondaryAxisLabelsVisible = $visible;
 
         return $this;
     }

@@ -161,6 +161,16 @@ class Chart
                                 $plotSeries = $plotAttributes = [];
                                 $catAxRead = false;
                                 $plotNoFill = false;
+                                $secondaryAxisIds = [];
+                                foreach ($chartDetails as $axisDetailKey => $axisDetail) {
+                                    if (in_array($axisDetailKey, [Axis::AXIS_TYPE_CATEGORY, Axis::AXIS_TYPE_DATE, Axis::AXIS_TYPE_VALUE], true)) {
+                                        $axisPosition = self::getAttributeString($axisDetail->axPos, 'val');
+                                        $axisId = self::getAttributeString($axisDetail->axId, 'val');
+                                        if ($axisId !== null && in_array($axisPosition, ['t', 'r'], true)) {
+                                            $secondaryAxisIds[$axisId] = self::getAttributeString($axisDetail->tickLblPos, 'val') !== 'none';
+                                        }
+                                    }
+                                }
                                 foreach ($chartDetails as $chartDetailKey => $chartDetail) {
                                     $chartDetail = Xlsx::testSimpleXml($chartDetail);
                                     switch ($chartDetailKey) {
@@ -304,7 +314,7 @@ class Chart
                                         case 'barChart':
                                         case 'bar3DChart':
                                             $barDirection = self::getAttributeString($chartDetail->barDir, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotDirection("$barDirection");
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
@@ -312,13 +322,13 @@ class Chart
                                             break;
                                         case 'lineChart':
                                         case 'line3DChart':
-                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
 
                                             break;
                                         case 'areaChart':
                                         case 'area3DChart':
-                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
 
                                             break;
@@ -326,7 +336,7 @@ class Chart
                                         case 'pieChart':
                                         case 'pie3DChart':
                                             $explosion = self::getAttributeString($chartDetail->ser->explosion, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotStyle("$explosion");
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
@@ -334,7 +344,7 @@ class Chart
                                             break;
                                         case 'scatterChart':
                                             $scatterStyle = self::getAttributeString($chartDetail->scatterStyle, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotStyle($scatterStyle);
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
@@ -342,7 +352,7 @@ class Chart
                                             break;
                                         case 'bubbleChart':
                                             $bubbleScale = self::getAttributeInteger($chartDetail->bubbleScale, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotStyle("$bubbleScale");
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
@@ -350,7 +360,7 @@ class Chart
                                             break;
                                         case 'radarChart':
                                             $radarStyle = self::getAttributeString($chartDetail->radarStyle, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotStyle($radarStyle);
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
@@ -359,14 +369,14 @@ class Chart
                                         case 'surfaceChart':
                                         case 'surface3DChart':
                                             $wireFrame = self::getAttributeBoolean($chartDetail->wireframe, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             $plotSer->setPlotStyle("$wireFrame");
                                             $plotSeries[] = $plotSer;
                                             $plotAttributes = $this->readChartAttributes($chartDetail);
 
                                             break;
                                         case 'stockChart':
-                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey);
+                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey, $secondaryAxisIds);
                                             if (isset($chartDetail->upDownBars->gapWidth)) {
                                                 $gapWidth = self::getAttributeInteger($chartDetail->upDownBars->gapWidth, 'val');
                                             }
@@ -596,7 +606,8 @@ class Chart
         return new Layout($layout);
     }
 
-    private function chartDataSeries(SimpleXMLElement $chartDetail, string $plotType): DataSeries
+    /** @param array<string, bool> $secondaryAxisIds */
+    private function chartDataSeries(SimpleXMLElement $chartDetail, string $plotType, array $secondaryAxisIds = []): DataSeries
     {
         $multiSeriesType = null;
         $smoothLine = false;
@@ -869,6 +880,17 @@ class Chart
         }
         $series = new DataSeries($plotType, $multiSeriesType, $plotOrder, $seriesLabel, $seriesCategory, $seriesValues, $plotDirection, $smoothLine);
         $series->setPlotBubbleSizes($seriesBubbles);
+        foreach ($chartDetail->axId as $axisId) {
+            $id = self::getAttributeString($axisId, 'val');
+            if ($id !== null && isset($secondaryAxisIds[$id])) {
+                $series->setSecondaryAxis();
+                if (!$secondaryAxisIds[$id]) {
+                    $series->setSecondaryAxisLabelsVisible(false);
+                }
+
+                break;
+            }
+        }
 
         return $series;
     }
