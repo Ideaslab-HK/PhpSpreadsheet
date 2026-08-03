@@ -2,6 +2,8 @@
 
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
+use PhpOffice\PhpSpreadsheet\Style\Font;
+
 class Legend
 {
     /** Legend positions */
@@ -140,6 +142,48 @@ class Legend
     public function getLegendText(): ?AxisText
     {
         return $this->legendText;
+    }
+
+    public function getFont(): ?Font
+    {
+        return $this->legendText?->getFont();
+    }
+
+    public function setFont(?Font $font): self
+    {
+        if ($this->legendText === null) {
+            $this->legendText = new AxisText();
+        }
+
+        $this->legendText->setFont($font);
+
+        return $this;
+    }
+
+    public function getFontSize(): ?float
+    {
+        $font = $this->getFont();
+
+        return $font === null ? null : $font->getSize();
+    }
+
+    public function setFontSize(?float $fontSize): self
+    {
+        if ($fontSize === null) {
+            $this->setFont(null);
+
+            return $this;
+        }
+
+        $font = $this->getFont();
+        if ($font === null) {
+            $font = new Font();
+        }
+
+        $font->setSize($fontSize);
+        $this->setFont($font);
+
+        return $this;
     }
 
     public function setLegendText(?AxisText $legendText): self

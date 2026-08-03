@@ -441,6 +441,7 @@ class Chart
                                 $legendBorderLines = null;
                                 $legendFillColor = null;
                                 $legendText = null;
+                                $legendFont = null;
                                 $addLegendText = false;
                                 foreach ($chartDetails as $chartDetailKey => $chartDetail) {
                                     $chartDetail = Xlsx::testSimpleXml($chartDetail);
@@ -481,6 +482,7 @@ class Chart
                                                 $this->readEffects($children->p->pPr->defRPr, $legendText, false);
                                                 $addLegendText = true;
                                             }
+                                            $legendFont = $this->parseFont($children->p);
 
                                             break;
                                     }
@@ -491,6 +493,9 @@ class Chart
                                 }
                                 if ($legendBorderLines !== null) {
                                     $legend->setBorderLines($legendBorderLines);
+                                }
+                                if ($legendFont !== null) {
+                                    $legend->setFont($legendFont);
                                 }
                                 if ($addLegendText) {
                                     $legend->setLegendText($legendText);
@@ -1313,6 +1318,9 @@ class Chart
             if (isset($chartDetail->dLbls->showBubbleSize)) {
                 $plotAttributes['showBubbleSize'] = self::getAttributeString($chartDetail->dLbls->showBubbleSize, 'val');
             }
+            if (isset($chartDetail->dLbls->separator)) {
+                $plotAttributes['separator'] = (string) $chartDetail->dLbls->separator;
+            }
             if (isset($chartDetail->dLbls->showLeaderLines)) {
                 $plotAttributes['showLeaderLines'] = self::getAttributeString($chartDetail->dLbls->showLeaderLines, 'val');
             }
@@ -1399,6 +1407,16 @@ class Chart
                     break;
                 case 'showLeaderLines':
                     $plotArea->setShowLeaderLines($plotAttributeValue);
+
+                    break;
+                case 'separator':
+                    /** @var string $plotAttributeValue */
+                    $plotArea->setSeparator($plotAttributeValue);
+
+                    break;
+                case 'dLblPos':
+                    /** @var string $plotAttributeValue */
+                    $plotArea->setDLblPos($plotAttributeValue);
 
                     break;
                 case 'labelFont':

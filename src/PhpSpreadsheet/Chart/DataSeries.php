@@ -103,6 +103,11 @@ class DataSeries
     private bool $secondaryAxisLabelsVisible = true;
 
     /**
+     * Show values in data labels, overriding the plot area layout when set.
+     */
+    private ?bool $showVal = null;
+
+    /**
      * Plot Values.
      *
      * @var DataSeriesValues[]
@@ -396,6 +401,18 @@ class DataSeries
     public function setSecondaryAxisLabelsVisible(bool $visible): static
     {
         $this->secondaryAxisLabelsVisible = $visible;
+
+        return $this;
+    }
+
+    public function getShowVal(): ?bool
+    {
+        return $this->showVal;
+    }
+
+    public function setShowVal(?bool $showVal): static
+    {
+        $this->showVal = $showVal;
 
         return $this;
     }

@@ -284,6 +284,7 @@ class Chart extends WriterPart
         $objWriter->endElement(); // c:spPr
 
         $legendText = $legend->getLegendText();
+        $legendFont = $legend->getFont();
         $objWriter->startElement('c:txPr');
         $objWriter->startElement('a:bodyPr');
         $objWriter->endElement();
@@ -291,23 +292,7 @@ class Chart extends WriterPart
         $objWriter->startElement('a:lstStyle');
         $objWriter->endElement();
 
-        $objWriter->startElement('a:p');
-        $objWriter->startElement('a:pPr');
-        $objWriter->writeAttribute('rtl', '0');
-
-        $objWriter->startElement('a:defRPr');
-        if ($legendText !== null) {
-            $this->writeColor($objWriter, $legendText->getFillColorObject());
-            $this->writeEffects($objWriter, $legendText);
-        }
-        $objWriter->endElement(); // a:defRpr
-        $objWriter->endElement(); // a:pPr
-
-        $objWriter->startElement('a:endParaRPr');
-        $objWriter->writeAttribute('lang', 'en-US');
-        $objWriter->endElement(); // a:endParaRPr
-
-        $objWriter->endElement(); // a:p
+        $this->writeLabelFont($objWriter, $legendFont, $legendText);
         $objWriter->endElement(); // c:txPr
 
         $objWriter->endElement(); // c:legend
@@ -369,7 +354,7 @@ class Chart extends WriterPart
                         $objWriter->endElement();
                     }
 
-                    $this->writePlotGroup($plotGroup, $chartType, $objWriter, $catIsMultiLevelSeries, $valIsMultiLevelSeries, $plotGroupingType);
+                    $this->writePlotGroup($plotGroup, $chartType, $objWriter, $catIsMultiLevelSeries, $valIsMultiLevelSeries, $plotGroupingType, $layout);
                 }
             }
 
@@ -563,11 +548,13 @@ class Chart extends WriterPart
     /**
      * Write Data Labels.
      */
-    private function writeDataLabels(XMLWriter $objWriter, ?Layout $chartLayout = null): void
+    private function writeDataLabels(XMLWriter $objWriter, ?Layout $chartLayout = null, ?DataSeries $dataSeries = null): void
     {
-        if (!isset($chartLayout)) {
+        $showVal = $dataSeries?->getShowVal();
+        if ($chartLayout === null && $showVal === null) {
             return;
         }
+        $chartLayout ??= new Layout();
         $objWriter->startElement('c:dLbls');
 
         $fillColor = $chartLayout->getLabelFillColor();
@@ -616,11 +603,14 @@ class Chart extends WriterPart
             $objWriter->endElement(); // c:dLblPos
         }
         $this->writeDataLabelsBool($objWriter, 'showLegendKey', $chartLayout->getShowLegendKey());
-        $this->writeDataLabelsBool($objWriter, 'showVal', $chartLayout->getShowVal());
+        $this->writeDataLabelsBool($objWriter, 'showVal', $showVal ?? $chartLayout->getShowVal());
         $this->writeDataLabelsBool($objWriter, 'showCatName', $chartLayout->getShowCatName());
         $this->writeDataLabelsBool($objWriter, 'showSerName', $chartLayout->getShowSerName());
         $this->writeDataLabelsBool($objWriter, 'showPercent', $chartLayout->getShowPercent());
         $this->writeDataLabelsBool($objWriter, 'showBubbleSize', $chartLayout->getShowBubbleSize());
+        if ($chartLayout->getSeparator() !== '') {
+            $objWriter->writeElement('c:separator', $chartLayout->getSeparator());
+        }
         $this->writeDataLabelsBool($objWriter, 'showLeaderLines', $chartLayout->getShowLeaderLines());
 
         $objWriter->endElement(); // c:dLbls
@@ -1193,7 +1183,7 @@ class Chart extends WriterPart
      * @param bool $valIsMultiLevelSeries Is value set a multi-series set
      * @param string $plotGroupingType Type of grouping for multi-series values
      */
-    private function writePlotGroup(?DataSeries $plotGroup, string $groupType, XMLWriter $objWriter, bool &$catIsMultiLevelSeries, bool &$valIsMultiLevelSeries, string &$plotGroupingType): void
+    private function writePlotGroup(?DataSeries $plotGroup, string $groupType, XMLWriter $objWriter, bool &$catIsMultiLevelSeries, bool &$valIsMultiLevelSeries, string &$plotGroupingType, ?Layout $chartLayout = null): void
     {
         if ($plotGroup === null) {
             return;
@@ -1261,8 +1251,29 @@ class Chart extends WriterPart
                     }
                 }
             }
-            if ($plotSeriesValues !== false && $plotSeriesValues->getLabelLayout()) {
-                $this->writeDataLabels($objWriter, $plotSeriesValues->getLabelLayout());
+            if ($plotSeriesValues !== false) {
+                $labelLayout = $plotSeriesValues->getLabelLayout();
+                if (in_array($groupType, [DataSeries::TYPE_PIECHART, DataSeries::TYPE_PIECHART_3D], true)) {
+                    $chartLabelPosition = $chartLayout?->getDLblPos() ?? '';
+                    $chartLabelFont = $chartLayout?->getLabelFont();
+                    $chartLabelSeparator = $chartLayout?->getSeparator() ?? '';
+                    $inheritPosition = $chartLabelPosition !== '' && ($labelLayout === null || $labelLayout->getDLblPos() === '');
+                    $inheritFont = $chartLabelFont !== null && ($labelLayout === null || $labelLayout->getLabelFont() === null);
+                    $inheritSeparator = $chartLabelSeparator !== '' && ($labelLayout === null || $labelLayout->getSeparator() === '');
+                    if ($inheritPosition || $inheritFont || $inheritSeparator) {
+                        $labelLayout = $labelLayout === null ? new Layout() : clone $labelLayout;
+                    }
+                    if ($inheritPosition) {
+                        $labelLayout->setDLblPos($chartLabelPosition);
+                    }
+                    if ($inheritFont) {
+                        $labelLayout->setLabelFont(clone $chartLabelFont);
+                    }
+                    if ($inheritSeparator) {
+                        $labelLayout->setSeparator($chartLabelSeparator);
+                    }
+                }
+                $this->writeDataLabels($objWriter, $labelLayout, $plotGroup);
             }
 
             //    Labels

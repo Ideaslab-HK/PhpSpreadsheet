@@ -6,6 +6,14 @@ use PhpOffice\PhpSpreadsheet\Style\Font;
 
 class Layout
 {
+    public const DLBL_POSITION_CENTER = 'ctr';
+
+    public const DLBL_POSITION_INSIDE_END = 'inEnd';
+
+    public const DLBL_POSITION_OUTSIDE_END = 'outEnd';
+
+    public const DLBL_POSITION_BEST_FIT = 'bestFit';
+
     /**
      * layoutTarget.
      */
@@ -91,6 +99,8 @@ class Layout
      */
     private ?bool $showLeaderLines = null;
 
+    private string $separator = '';
+
     private ?ChartColor $labelFillColor = null;
 
     private ?ChartColor $labelBorderColor = null;
@@ -135,7 +145,9 @@ class Layout
          *     w?:float,
          *     h?:float,
          *     dLblPos?: string,
+         *     separator?: string,
          *     labelFont?: ?mixed,
+         *     labelFontSize?: float|int,
          *     labelFontColor?: ?mixed,
          *     labelEffects?: ?mixed,
          *     numFmtCode?: string,
@@ -164,7 +176,10 @@ class Layout
             $this->height = (float) $layout['h'];
         }
         if (isset($layout['dLblPos'])) {
-            $this->dLblPos = (string) $layout['dLblPos'];
+            $this->dLblPos = self::normalizeDLblPos((string) $layout['dLblPos']);
+        }
+        if (isset($layout['separator'])) {
+            $this->separator = (string) $layout['separator'];
         }
         if (isset($layout['numFmtCode'])) {
             $this->numFmtCode = (string) $layout['numFmtCode'];
@@ -182,6 +197,10 @@ class Layout
         $labelFont = $layout['labelFont'] ?? null;
         if ($labelFont instanceof Font) {
             $this->labelFont = $labelFont;
+        }
+        $labelFontSize = $layout['labelFontSize'] ?? null;
+        if (is_numeric($labelFontSize)) {
+            $this->setLabelFontSize((float) $labelFontSize);
         }
         $labelFontColor = $layout['labelFontColor'] ?? null;
         if ($labelFontColor instanceof ChartColor) {
@@ -465,6 +484,18 @@ class Layout
         return $this;
     }
 
+    public function getSeparator(): string
+    {
+        return $this->separator;
+    }
+
+    public function setSeparator(string $separator): self
+    {
+        $this->separator = $separator;
+
+        return $this;
+    }
+
     public function getLabelFillColor(): ?ChartColor
     {
         return $this->labelFillColor;
@@ -501,6 +532,28 @@ class Layout
         return $this;
     }
 
+    public function getLabelFontSize(): ?float
+    {
+        return $this->labelFont?->getSize();
+    }
+
+    public function setLabelFontSize(?float $labelFontSize): self
+    {
+        if ($labelFontSize === null) {
+            if ($this->labelFont !== null) {
+                $this->labelFont->setSize(null, true);
+            }
+
+            return $this;
+        }
+        if ($this->labelFont === null) {
+            $this->labelFont = new Font();
+        }
+        $this->labelFont->setSize($labelFontSize);
+
+        return $this;
+    }
+
     public function getLabelEffects(): ?Properties
     {
         return $this->labelEffects;
@@ -524,14 +577,32 @@ class Layout
 
     public function getDLblPos(): string
     {
-        return $this->dLblPos;
+        return self::normalizeDLblPos($this->dLblPos);
     }
 
     public function setDLblPos(string $dLblPos): self
     {
-        $this->dLblPos = $dLblPos;
+        $this->dLblPos = self::normalizeDLblPos($dLblPos);
 
         return $this;
+    }
+
+    private static function normalizeDLblPos(string $dLblPos): string
+    {
+        $value = trim($dLblPos);
+        if ($value === '') {
+            return '';
+        }
+
+        $normalized = strtolower(str_replace([' ', '-'], '', $value));
+
+        return match ($normalized) {
+            'center', 'ctr' => self::DLBL_POSITION_CENTER,
+            'insideend' => self::DLBL_POSITION_INSIDE_END,
+            'outsideend' => self::DLBL_POSITION_OUTSIDE_END,
+            'bestfit' => self::DLBL_POSITION_BEST_FIT,
+            default => $value,
+        };
     }
 
     public function getNumFmtCode(): string
